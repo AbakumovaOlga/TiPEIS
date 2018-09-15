@@ -1,3 +1,3 @@
 # TiPEIS
 
-![Диаграмма](https://github.com/AbakumovaOlga/TiPEIS/master/TiPEIS/image.png)
+![Image alt](https://github.com/AbakumovaOlga/TiPEIS/raw/master/Диаграмма.jpg)
