@@ -134,21 +134,56 @@ namespace TiPEIS
             }
             
             string summa;
+            string s = F_summa.Text;
+            s = s.Replace(",", ".");
+            int k = s.IndexOf(".");
             Regex regexSumma = new Regex(@"^[0-9]{0,10}(?:[.,][0-9]{0,2})?\z");
             if (F_summa.Text == "")
             {
                 summa = "0";
-            }
-            else if(regexSumma.IsMatch(F_summa.Text))
+            } else if (s.IndexOf(".")!=-1)
             {
-                summa = F_summa.Text.Replace(",", ".");
+                if (s.Substring(0, s.LastIndexOf('.')).Length > 11)
+                {
+                    MessageBox.Show("Слишком длинное число");
+                    return;
+                }
+                else
+                {
+                    if (regexSumma.IsMatch(F_summa.Text))
+                    {
+                        summa = F_summa.Text.Replace(",", ".");
 
-                //summa = Convert.ToDouble(s);
+                        //summa = Convert.ToDouble(s);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Несоответсвие формату Сумма");
+                        return;
+                    }
+                }
             }
             else
             {
-                MessageBox.Show("Несоответсвие формату Сумма");
-                return;
+                if (s.Length>11)
+                {
+                    MessageBox.Show("Слишком длинное число");
+                    return;
+                }
+                else
+                {
+                    if (regexSumma.IsMatch(F_summa.Text))
+                    {
+                        summa = F_summa.Text.Replace(",", ".");
+
+                        //summa = Convert.ToDouble(s);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Несоответсвие формату Сумма");
+                        return;
+                    }
+                }
             }
 
 
