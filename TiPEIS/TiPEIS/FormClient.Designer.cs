@@ -39,20 +39,21 @@
             // dataGridView1
             // 
             this.dataGridView1.AllowUserToAddRows = false;
+            this.dataGridView1.AllowUserToDeleteRows = false;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(12, 46);
+            this.dataGridView1.Location = new System.Drawing.Point(12, 59);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowTemplate.Height = 28;
-            this.dataGridView1.Size = new System.Drawing.Size(776, 393);
+            this.dataGridView1.Size = new System.Drawing.Size(776, 380);
             this.dataGridView1.TabIndex = 2;
             this.dataGridView1.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseClick);
             // 
             // F_Delete
             // 
-            this.F_Delete.Location = new System.Drawing.Point(713, 10);
+            this.F_Delete.Location = new System.Drawing.Point(713, 20);
             this.F_Delete.Name = "F_Delete";
-            this.F_Delete.Size = new System.Drawing.Size(75, 30);
+            this.F_Delete.Size = new System.Drawing.Size(75, 33);
             this.F_Delete.TabIndex = 9;
             this.F_Delete.Text = "Delete";
             this.F_Delete.UseVisualStyleBackColor = true;
@@ -60,9 +61,9 @@
             // 
             // F_Update
             // 
-            this.F_Update.Location = new System.Drawing.Point(632, 10);
+            this.F_Update.Location = new System.Drawing.Point(632, 19);
             this.F_Update.Name = "F_Update";
-            this.F_Update.Size = new System.Drawing.Size(75, 30);
+            this.F_Update.Size = new System.Drawing.Size(75, 32);
             this.F_Update.TabIndex = 8;
             this.F_Update.Text = "Update";
             this.F_Update.UseVisualStyleBackColor = true;
@@ -70,9 +71,9 @@
             // 
             // F_Add
             // 
-            this.F_Add.Location = new System.Drawing.Point(551, 10);
+            this.F_Add.Location = new System.Drawing.Point(551, 19);
             this.F_Add.Name = "F_Add";
-            this.F_Add.Size = new System.Drawing.Size(75, 30);
+            this.F_Add.Size = new System.Drawing.Size(75, 32);
             this.F_Add.TabIndex = 7;
             this.F_Add.Text = "Add";
             this.F_Add.UseVisualStyleBackColor = true;
@@ -80,7 +81,7 @@
             // 
             // F_value
             // 
-            this.F_value.Location = new System.Drawing.Point(12, 12);
+            this.F_value.Location = new System.Drawing.Point(12, 19);
             this.F_value.Name = "F_value";
             this.F_value.Size = new System.Drawing.Size(533, 26);
             this.F_value.TabIndex = 6;

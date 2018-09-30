@@ -15,12 +15,12 @@ namespace TiPEIS
 {
     public partial class FormUpdate : Form
     {
-        //int Id
-        //string startDate
-        //int(10) term
-        //double(10,2) summa в бд 15
+        //int Id !
+        //data startDate !
+        //int(10) term !
+        //double(10,2) summa в бд 15 !
         //int(10) termFact
-        //string finishDate
+        //data finishDate
         //double(10,2) percent1
         //double(10,2) percent2
 
@@ -50,7 +50,7 @@ namespace TiPEIS
                 string ConnectionString = @"Data Source=" + sPath + ";New=False;Version=3";
 
                 object startDate = selectValue(ConnectionString, "SELECT startDate FROM Contract WHERE Id=" + Id + ";");
-                F_dateStart.Text = startDate.ToString();
+                F_startDate.Value = Convert.ToDateTime(startDate.ToString());
 
                 object term = selectValue(ConnectionString, "SELECT term FROM Contract WHERE Id=" + Id + ";");
                 F_term.Text = term.ToString();
@@ -62,7 +62,7 @@ namespace TiPEIS
                 F_termFact.Text = termFact.ToString();
 
                 object finishDate = selectValue(ConnectionString, "SELECT finishDate FROM Contract WHERE Id=" + Id + ";");
-                F_dateFinish.Text = finishDate.ToString();
+                F_finishDate.Value = Convert.ToDateTime(finishDate.ToString());
 
                 object percent1 = selectValue(ConnectionString, "SELECT percent1 FROM Contract WHERE Id=" + Id + ";");
                 F_Percent1.Text = percent1.ToString();
@@ -115,13 +115,14 @@ namespace TiPEIS
 
         private void F_Save_Click(object sender, EventArgs e)
         {
-            string startDate = F_dateStart.Text;
+            string startDate = F_startDate.Value.Date.ToString("yyyy.MM.dd");
 
             int term;
             Regex regexTerm = new Regex(@"^\d{1,10}$");
             if (F_term.Text == "")
             {
-                term = 0;
+                MessageBox.Show("Заплните обязательные поля");
+                return;
             }
             else if (regexTerm.IsMatch(F_term.Text))
             {
@@ -129,10 +130,10 @@ namespace TiPEIS
             }
             else
             {
-                MessageBox.Show("Несоответсвие формату Срок по догвору");
+                MessageBox.Show("Несоответсвие формату Срок по договору");
                 return;
             }
-            
+
             string summa;
             string s = F_summa.Text;
             s = s.Replace(",", ".");
@@ -140,8 +141,10 @@ namespace TiPEIS
             Regex regexSumma = new Regex(@"^[0-9]{0,10}(?:[.,][0-9]{0,2})?\z");
             if (F_summa.Text == "")
             {
-                summa = "0";
-            } else if (s.IndexOf(".")!=-1)
+                MessageBox.Show("Заполните обязательные поля");
+                return;
+            }
+            else if (s.IndexOf(".") != -1)
             {
                 if (s.Substring(0, s.LastIndexOf('.')).Length > 11)
                 {
@@ -153,8 +156,6 @@ namespace TiPEIS
                     if (regexSumma.IsMatch(F_summa.Text))
                     {
                         summa = F_summa.Text.Replace(",", ".");
-
-                        //summa = Convert.ToDouble(s);
                     }
                     else
                     {
@@ -165,7 +166,7 @@ namespace TiPEIS
             }
             else
             {
-                if (s.Length>11)
+                if (s.Length > 11)
                 {
                     MessageBox.Show("Слишком длинное число");
                     return;
@@ -175,8 +176,6 @@ namespace TiPEIS
                     if (regexSumma.IsMatch(F_summa.Text))
                     {
                         summa = F_summa.Text.Replace(",", ".");
-
-                        //summa = Convert.ToDouble(s);
                     }
                     else
                     {
@@ -186,31 +185,45 @@ namespace TiPEIS
                 }
             }
 
-
             int termFact;
-            
-            if (F_termFact.Text == "")
-            {
-                termFact = 0;
-            }
-            else if (regexTerm.IsMatch(F_termFact.Text))
-            {
-                termFact = Convert.ToInt32(F_termFact.Text);
+            string finishDate;
+            if (F_done.Checked) {
+                finishDate = F_finishDate.Value.Date.ToString("yyyy.MM.dd");
+
+                if(F_startDate.Value.Date > F_finishDate.Value.Date)
+                {
+                    MessageBox.Show("Проверьте дату");
+                    return;
+                }
+
+                if (F_termFact.Text == "")
+                {
+                    termFact = 0;
+                }
+                else if (regexTerm.IsMatch(F_termFact.Text))
+                {
+                    termFact = Convert.ToInt32(F_termFact.Text);
+                }
+                else
+                {
+                    MessageBox.Show("Несоответсвие формату Фактический срок");
+                    return;
+                }
+
             }
             else
             {
-                MessageBox.Show("Несоответсвие формату Фактический срок");
-                return;
+                termFact = 0;
+                finishDate = "";
             }
 
-            string finishDate = F_dateFinish.Text;
 
             string percent1;
             if (F_Percent1.Text == "")
             {
                 percent1 = "0";
             }
-            else if(regexSumma.IsMatch(F_Percent1.Text))
+            else if (regexSumma.IsMatch(F_Percent1.Text))
             {
                 percent1 = F_Percent1.Text.Replace(",", ".");
             }
@@ -225,7 +238,7 @@ namespace TiPEIS
             {
                 percent2 = "0";
             }
-            else if(regexSumma.IsMatch(F_Percent2.Text))
+            else if (regexSumma.IsMatch(F_Percent2.Text))
             {
                 percent2 = F_Percent2.Text.Replace(",", ".");
             }
@@ -239,8 +252,8 @@ namespace TiPEIS
             if (Id != 0)
             {
                 String selectCommand = "update Contract set " +
-                    "startDate='" + startDate +
-                    "', term=" + term +
+                  "startDate='" + startDate + "'" +
+                    ", term=" + term +
                     ", summa=" + summa +
                     ", termFact=" + termFact +
                     ", finishDate='" + finishDate +
@@ -263,6 +276,20 @@ namespace TiPEIS
                 ExecuteQuery(txtSQLQuery);
             }
             MessageBox.Show("Успешно");
+        }
+
+        private void F_done_CheckedChanged(object sender, EventArgs e)
+        {
+            if (F_done.Checked)
+            {
+                F_finishDate.Enabled = true;
+                F_termFact.Enabled = true;
+            }
+        }
+
+        private void F_finishDate_ValueChanged(object sender, EventArgs e)
+        {
+            F_termFact.Text = (F_finishDate.Value.Date - F_startDate.Value.Date).TotalDays.ToString();
         }
     }
 }

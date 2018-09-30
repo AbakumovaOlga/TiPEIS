@@ -35,19 +35,20 @@
             // dataGridView1
             // 
             this.dataGridView1.AllowUserToAddRows = false;
+            this.dataGridView1.AllowUserToDeleteRows = false;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Location = new System.Drawing.Point(12, 12);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowTemplate.Height = 28;
-            this.dataGridView1.Size = new System.Drawing.Size(1288, 426);
+            this.dataGridView1.Size = new System.Drawing.Size(1416, 430);
             this.dataGridView1.TabIndex = 0;
             // 
             // FormChartAcc
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1312, 454);
+            this.ClientSize = new System.Drawing.Size(1440, 454);
             this.Controls.Add(this.dataGridView1);
             this.Name = "FormChartAcc";
             this.Text = "План счетов";

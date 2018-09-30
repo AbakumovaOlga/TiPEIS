@@ -40,9 +40,10 @@
             this.F_termFact = new System.Windows.Forms.TextBox();
             this.F_Percent2 = new System.Windows.Forms.MaskedTextBox();
             this.F_Save = new System.Windows.Forms.Button();
-            this.F_dateFinish = new System.Windows.Forms.MaskedTextBox();
             this.F_Percent1 = new System.Windows.Forms.MaskedTextBox();
-            this.F_dateStart = new System.Windows.Forms.MaskedTextBox();
+            this.F_startDate = new System.Windows.Forms.DateTimePicker();
+            this.F_finishDate = new System.Windows.Forms.DateTimePicker();
+            this.F_done = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -50,27 +51,27 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(21, 89);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(183, 20);
+            this.label1.Size = new System.Drawing.Size(193, 20);
             this.label1.TabIndex = 1;
-            this.label1.Text = "Дата начала договора";
+            this.label1.Text = "Дата начала договора *";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(21, 180);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(192, 20);
+            this.label2.Size = new System.Drawing.Size(202, 20);
             this.label2.TabIndex = 2;
-            this.label2.Text = "Срок займа по договору";
+            this.label2.Text = "Срок займа по договору *";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(21, 270);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(134, 20);
+            this.label3.Size = new System.Drawing.Size(144, 20);
             this.label3.TabIndex = 3;
-            this.label3.Text = "Сумма договора";
+            this.label3.Text = "Сумма договора *";
             // 
             // label4
             // 
@@ -124,6 +125,7 @@
             // 
             // F_termFact
             // 
+            this.F_termFact.Enabled = false;
             this.F_termFact.Location = new System.Drawing.Point(281, 203);
             this.F_termFact.Name = "F_termFact";
             this.F_termFact.Size = new System.Drawing.Size(200, 26);
@@ -146,15 +148,6 @@
             this.F_Save.UseVisualStyleBackColor = true;
             this.F_Save.Click += new System.EventHandler(this.F_Save_Click);
             // 
-            // F_dateFinish
-            // 
-            this.F_dateFinish.Location = new System.Drawing.Point(281, 112);
-            this.F_dateFinish.Mask = "00/00/0000";
-            this.F_dateFinish.Name = "F_dateFinish";
-            this.F_dateFinish.Size = new System.Drawing.Size(200, 26);
-            this.F_dateFinish.TabIndex = 17;
-            this.F_dateFinish.ValidatingType = typeof(System.DateTime);
-            // 
             // F_Percent1
             // 
             this.F_Percent1.Location = new System.Drawing.Point(584, 112);
@@ -162,23 +155,42 @@
             this.F_Percent1.Size = new System.Drawing.Size(200, 26);
             this.F_Percent1.TabIndex = 18;
             // 
-            // F_dateStart
+            // F_startDate
             // 
-            this.F_dateStart.Location = new System.Drawing.Point(25, 112);
-            this.F_dateStart.Mask = "00/00/0000";
-            this.F_dateStart.Name = "F_dateStart";
-            this.F_dateStart.Size = new System.Drawing.Size(200, 26);
-            this.F_dateStart.TabIndex = 19;
-            this.F_dateStart.ValidatingType = typeof(System.DateTime);
+            this.F_startDate.Location = new System.Drawing.Point(25, 112);
+            this.F_startDate.Name = "F_startDate";
+            this.F_startDate.Size = new System.Drawing.Size(200, 26);
+            this.F_startDate.TabIndex = 20;
+            // 
+            // F_finishDate
+            // 
+            this.F_finishDate.Enabled = false;
+            this.F_finishDate.Location = new System.Drawing.Point(281, 112);
+            this.F_finishDate.Name = "F_finishDate";
+            this.F_finishDate.Size = new System.Drawing.Size(200, 26);
+            this.F_finishDate.TabIndex = 21;
+            this.F_finishDate.ValueChanged += new System.EventHandler(this.F_finishDate_ValueChanged);
+            // 
+            // F_done
+            // 
+            this.F_done.AutoSize = true;
+            this.F_done.Location = new System.Drawing.Point(315, 35);
+            this.F_done.Name = "F_done";
+            this.F_done.Size = new System.Drawing.Size(122, 24);
+            this.F_done.TabIndex = 22;
+            this.F_done.Text = "Завершено";
+            this.F_done.UseVisualStyleBackColor = true;
+            this.F_done.CheckedChanged += new System.EventHandler(this.F_done_CheckedChanged);
             // 
             // FormUpdate
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.F_dateStart);
+            this.Controls.Add(this.F_done);
+            this.Controls.Add(this.F_finishDate);
+            this.Controls.Add(this.F_startDate);
             this.Controls.Add(this.F_Percent1);
-            this.Controls.Add(this.F_dateFinish);
             this.Controls.Add(this.F_Save);
             this.Controls.Add(this.F_Percent2);
             this.Controls.Add(this.F_termFact);
@@ -212,8 +224,9 @@
         private System.Windows.Forms.TextBox F_termFact;
         private System.Windows.Forms.MaskedTextBox F_Percent2;
         private System.Windows.Forms.Button F_Save;
-        private System.Windows.Forms.MaskedTextBox F_dateFinish;
         private System.Windows.Forms.MaskedTextBox F_Percent1;
-        private System.Windows.Forms.MaskedTextBox F_dateStart;
+        private System.Windows.Forms.DateTimePicker F_startDate;
+        private System.Windows.Forms.DateTimePicker F_finishDate;
+        private System.Windows.Forms.CheckBox F_done;
     }
 }
