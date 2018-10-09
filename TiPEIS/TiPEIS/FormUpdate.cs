@@ -18,7 +18,7 @@ namespace TiPEIS
         //int Id !
         //data startDate !
         //int(10) term !
-        //double(10,2) summa в бд 15 !
+        //double(10,2) summa
         //int(10) termFact
         //data finishDate
         //double(10,2) percent1
@@ -62,6 +62,7 @@ namespace TiPEIS
                 F_termFact.Text = termFact.ToString();
 
                 object finishDate = selectValue(ConnectionString, "SELECT finishDate FROM Contract WHERE Id=" + Id + ";");
+                if(finishDate.ToString()!="")
                 F_finishDate.Value = Convert.ToDateTime(finishDate.ToString());
 
                 object percent1 = selectValue(ConnectionString, "SELECT percent1 FROM Contract WHERE Id=" + Id + ";");
@@ -69,6 +70,11 @@ namespace TiPEIS
 
                 object percent2 = selectValue(ConnectionString, "SELECT percent2 FROM Contract WHERE Id=" + Id + ";");
                 F_Percent2.Text = percent2.ToString();
+
+                if(Convert.ToInt32(termFact) > 0)
+                {
+                    F_done.Checked=true;
+                }
             }
         }
 
@@ -118,10 +124,14 @@ namespace TiPEIS
             string startDate = F_startDate.Value.Date.ToString("yyyy.MM.dd");
 
             int term;
-            Regex regexTerm = new Regex(@"^\d{1,10}$");
+            Regex regexTerm = new Regex(@"^\d{1,7}$");
             if (F_term.Text == "")
             {
-                MessageBox.Show("Заплните обязательные поля");
+                MessageBox.Show("Заполните обязательные поля");
+                return;
+            }else if (F_term.Text.Length>7)
+            {
+                MessageBox.Show("Слишком большое число Срок по договору. Не более 7 символов");
                 return;
             }
             else if (regexTerm.IsMatch(F_term.Text))
@@ -148,7 +158,7 @@ namespace TiPEIS
             {
                 if (s.Substring(0, s.LastIndexOf('.')).Length > 11)
                 {
-                    MessageBox.Show("Слишком длинное число");
+                    MessageBox.Show("Слишком длинное число. Не более 11 символов");
                     return;
                 }
                 else
@@ -166,9 +176,9 @@ namespace TiPEIS
             }
             else
             {
-                if (s.Length > 11)
+                if (s.Length >= 11)
                 {
-                    MessageBox.Show("Слишком длинное число");
+                    MessageBox.Show("Слишком длинное число сумма. Не более 11 символов");
                     return;
                 }
                 else
@@ -200,6 +210,11 @@ namespace TiPEIS
                 {
                     termFact = 0;
                 }
+                else if (F_termFact.Text.Length > 7)
+                {
+                    MessageBox.Show("Слишком большое число Фактический срок. Не более 7 символов");
+                    return;
+                }
                 else if (regexTerm.IsMatch(F_termFact.Text))
                 {
                     termFact = Convert.ToInt32(F_termFact.Text);
@@ -218,12 +233,19 @@ namespace TiPEIS
             }
 
 
+            Regex regexPer = new Regex(@"^[0-1]{1}(?:[.,][0-9]{0,2})?\z");
+
             string percent1;
             if (F_Percent1.Text == "")
             {
                 percent1 = "0";
             }
-            else if (regexSumma.IsMatch(F_Percent1.Text))
+            else if (F_Percent1.Text.Length > 4)
+            {
+                MessageBox.Show("Слишком большое число  Процент1. Не более 4 символов");
+                return;
+            }
+            else if (regexPer.IsMatch(F_Percent1.Text))
             {
                 percent1 = F_Percent1.Text.Replace(",", ".");
             }
@@ -238,7 +260,12 @@ namespace TiPEIS
             {
                 percent2 = "0";
             }
-            else if (regexSumma.IsMatch(F_Percent2.Text))
+            else if (F_Percent2.Text.Length > 4)
+            {
+                MessageBox.Show("Слишком большое число  Процент2. Не более 4 символов");
+                return;
+            }
+            else if (regexPer.IsMatch(F_Percent2.Text))
             {
                 percent2 = F_Percent2.Text.Replace(",", ".");
             }

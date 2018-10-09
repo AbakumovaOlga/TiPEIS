@@ -97,7 +97,7 @@
             this.Controls.Add(this.F_value);
             this.Controls.Add(this.dataGridView1);
             this.Name = "FormAgent";
-            this.Text = "FormAgent";
+            this.Text = "Agent";
             this.Load += new System.EventHandler(this.FormAgent_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);

@@ -117,6 +117,7 @@ namespace TiPEIS
 
         private void F_Add_Click(object sender, EventArgs e)
         {
+            
             string ConnectionString = @"Data Source=" + sPath + ";New=False;Version=3";
             String selectCommand = "select MAX(Id) from Client";
             object maxValue = selectValue(ConnectionString, selectCommand);
@@ -137,6 +138,10 @@ namespace TiPEIS
 
         private void F_Update_Click(object sender, EventArgs e)
         {
+            if (dataGridView1.SelectedRows.Count != 1)
+            {
+                return;
+            }
             //выбрана строка CurrentRow
             int CurrentRow = dataGridView1.SelectedCells[0].RowIndex;
             //получить значение Name выбранной строки
@@ -158,6 +163,10 @@ namespace TiPEIS
 
         private void F_Delete_Click(object sender, EventArgs e)
         {
+            if (dataGridView1.SelectedRows.Count != 1)
+            {
+                return;
+            }
             // выбрана строка CurrentRow
             int CurrentRow = dataGridView1.SelectedCells[0].RowIndex;
             //получить значение idAgent выбранной строки

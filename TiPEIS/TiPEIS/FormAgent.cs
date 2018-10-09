@@ -139,6 +139,10 @@ namespace TiPEIS
 
         private void F_Update_Click(object sender, EventArgs e)
         {
+            if (dataGridView1.SelectedRows.Count != 1)
+            {
+                return;
+            }
             //выбрана строка CurrentRow
             int CurrentRow = dataGridView1.SelectedCells[0].RowIndex;
             //получить значение Name выбранной строки
@@ -160,6 +164,10 @@ namespace TiPEIS
 
         private void F_Delete_Click(object sender, EventArgs e)
         {
+            if (dataGridView1.SelectedRows.Count != 1)
+            {
+                return;
+            }
             // выбрана строка CurrentRow
             int CurrentRow = dataGridView1.SelectedCells[0].RowIndex;
             //получить значение idAgent выбранной строки

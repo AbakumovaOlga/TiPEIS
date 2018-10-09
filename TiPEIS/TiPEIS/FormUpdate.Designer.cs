@@ -140,9 +140,9 @@
             // 
             // F_Save
             // 
-            this.F_Save.Location = new System.Drawing.Point(388, 409);
+            this.F_Save.Location = new System.Drawing.Point(388, 395);
             this.F_Save.Name = "F_Save";
-            this.F_Save.Size = new System.Drawing.Size(75, 23);
+            this.F_Save.Size = new System.Drawing.Size(75, 37);
             this.F_Save.TabIndex = 16;
             this.F_Save.Text = "Save";
             this.F_Save.UseVisualStyleBackColor = true;

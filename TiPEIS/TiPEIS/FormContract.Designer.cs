@@ -88,7 +88,7 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.dataGridView1);
             this.Name = "FormContract";
-            this.Text = "FormContract";
+            this.Text = "Contract";
             this.Load += new System.EventHandler(this.FormContract_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);

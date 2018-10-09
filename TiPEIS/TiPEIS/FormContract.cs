@@ -79,6 +79,10 @@ namespace TiPEIS
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellMouseEventArgs e)
         {
+            if (dataGridView1.SelectedRows.Count!=1)
+            {
+                return;
+            }
             int id = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[0].Value);
             var form = new FormUpdate(id);
             form.Show();
@@ -99,6 +103,10 @@ namespace TiPEIS
 
         private void F_Delete_Click(object sender, EventArgs e)
         {
+            if (dataGridView1.SelectedRows.Count != 1)
+            {
+                return;
+            }
             // выбрана строка CurrentRow
             int CurrentRow = dataGridView1.SelectedCells[0].RowIndex;
             //получить значение idAgent выбранной строки
