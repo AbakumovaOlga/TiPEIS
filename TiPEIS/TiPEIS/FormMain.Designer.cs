@@ -104,6 +104,7 @@
             this.отчетыToolStripMenuItem.Name = "отчетыToolStripMenuItem";
             this.отчетыToolStripMenuItem.Size = new System.Drawing.Size(108, 29);
             this.отчетыToolStripMenuItem.Text = "Операции";
+            this.отчетыToolStripMenuItem.Click += new System.EventHandler(this.отчетыToolStripMenuItem_Click);
             // 
             // операцииToolStripMenuItem
             // 

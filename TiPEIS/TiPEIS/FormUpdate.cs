@@ -15,6 +15,7 @@ namespace TiPEIS
 {
     public partial class FormUpdate : Form
     {
+        //Contract
         //int Id !
         //data startDate !
         //int(10) term !
