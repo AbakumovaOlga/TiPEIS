@@ -45,62 +45,20 @@ namespace TiPEIS
             sql_con.Close();
         }
 
-        public void refreshForm(string ConnectionString)
+        public void selectTable(string ConnectionString, String selectCommand)
         {
-            selectTable(ConnectionString);
-            dataGridView1.Update();
-            dataGridView1.Refresh();
-        }
-
-        public void selectTable(string ConnectionString)
-        {
-            try
-            {
-                SQLiteConnection connect = new
-                SQLiteConnection(ConnectionString);
-                connect.Open();
-                SQLiteDataAdapter dataAdapter = new
-                SQLiteDataAdapter("Select Id, Date, DT, SubkontoDT1, SubkontoDT2, SubkontoDT3, KT, SubkontoKT1, SubkontoKT2, SubkontoKT3, Count, Summa, IDOperation, Comment from LogWiring", connect);
-                DataSet ds = new DataSet();
-                dataAdapter.Fill(ds);
-                dataGridView1.DataSource = ds;
-                dataGridView1.DataMember = ds.Tables[0].ToString();
-                connect.Close();
-                dataGridView1.Columns["IDJournalEntries"].DisplayIndex = 0;
-                dataGridView1.Columns["Date"].DisplayIndex = 1;
-                dataGridView1.Columns["DT"].DisplayIndex = 2;
-                dataGridView1.Columns["SubkontoDT1"].DisplayIndex = 3;
-                dataGridView1.Columns["SubkontoDT2"].DisplayIndex = 4;
-                dataGridView1.Columns["SubkontoDT3"].DisplayIndex = 5;
-                dataGridView1.Columns["KT"].DisplayIndex = 6;
-                dataGridView1.Columns["SubkontoKT1"].DisplayIndex = 7;
-                dataGridView1.Columns["SubkontoKT2"].DisplayIndex = 8;
-                dataGridView1.Columns["SubkontoKT3"].DisplayIndex = 9;
-                dataGridView1.Columns["Count"].DisplayIndex = 10;
-                dataGridView1.Columns["Summa"].DisplayIndex = 11;
-                dataGridView1.Columns["IDOperation"].DisplayIndex = 12;
-                dataGridView1.Columns["Comment"].DisplayIndex = 13;
-            }
-            catch
-            {
-                MessageBox.Show("Произошла ошибка");
-            }
-        }
-
-        public void selectCombo(string ConnectionString, String selectCommand, ComboBox comboBox, string displayMember, string valueMember)
-        {
-            SQLiteConnection connect = new
-            SQLiteConnection(ConnectionString);
+            SQLiteConnection connect = new SQLiteConnection(ConnectionString);
             connect.Open();
-            SQLiteDataAdapter dataAdapter = new
-            SQLiteDataAdapter(selectCommand, connect);
+            SQLiteDataAdapter dataAdapter = new SQLiteDataAdapter(selectCommand, connect);
+            //SQLiteDataAdapter dataAdapter = new SQLiteDataAdapter("SELECT W.Id, W.Summa, W.Date, W.content, W.Deb, A.FIO, C.FIO, W.subkontoDeb3, W.Cred FROM [LogWiring] W JOIN Agent A ON W.subkontoDeb1 = A.Id JOIN Client C ON W.subkontoDeb2= C.Id ", connect);
             DataSet ds = new DataSet();
             dataAdapter.Fill(ds);
-            comboBox.DataSource = ds.Tables[0];
-            comboBox.DisplayMember = displayMember;
-            comboBox.ValueMember = valueMember;
+            dataGridView1.DataSource = ds;
+            dataGridView1.DataMember = ds.Tables[0].ToString();
             connect.Close();
         }
+
+        
 
         public object selectValue(string ConnectionString, String selectCommand)
         {
@@ -136,76 +94,57 @@ namespace TiPEIS
         private void FormLogWir_Load(object sender, EventArgs e)
         {
             string ConnectionString = @"Data Source=" + sPath + ";New=False;Version=3";
-            selectTable(ConnectionString);
-            // выбрать значения из справочников для отображения в comboBox
-            /*String selectOS = "Select idOS, Name from Contract";
-            selectCombo(ConnectionString, selectOS, F_Doc, "Name", "idOS");*/
-            String selectSubd = "SELECT idSubdivision, Name FROM Subdivision";
-            selectCombo(ConnectionString, selectSubd, F_Agent, "Name", "idSubdivision");
-            String selectMOL = "SELECT idMOL, Name FROM MOL";
-            selectCombo(ConnectionString, selectMOL, F_Client, "Name", "idMOL");
-            F_Doc.SelectedIndex = -1;
-            F_Agent.SelectedIndex = -1;
-            F_Client.SelectedIndex = -1;
+            String selectCommand = "Select * from LogWiring";
+            selectTable(ConnectionString, selectCommand);
+        }
+        public void refreshForm(string ConnectionString, String selectCommand)
+        {
+            selectTable(ConnectionString, selectCommand);
+            dataGridView1.Update();
+            dataGridView1.Refresh();
+            F_Com.Text = "";
+        }
+        private bool CheckValue()
+        {
+            if (F_Com.Text.Length >= 100)
+            {
+                MessageBox.Show("Слишком длинная входная строка. Введите не более 100 символов");
+                return false;
+            }
+            return true;
+        }
+        private void F_Ok_Click(object sender, EventArgs e)
+        {
+            if (dataGridView1.SelectedRows.Count != 1)
+            {
+                return;
+            }
+            //выбрана строка CurrentRow
+            int CurrentRow = dataGridView1.SelectedCells[0].RowIndex;
+            //получить значение Name выбранной строки
+            string valueId = dataGridView1[0, CurrentRow].Value.ToString();
+            string changeName = F_Com.Text;
+            //обновление Name
+            if (CheckValue())
+            {
+                String selectCommand = "update LogWiring set content='" + changeName + "' where Id = " + valueId;
+                string ConnectionString = @"Data Source=" + sPath +
+                ";New=False;Version=3";
+                changeValue(ConnectionString, selectCommand);
+                //обновление dataGridView1
+                selectCommand = "select * from LogWiring";
+                refreshForm(ConnectionString, selectCommand);
+                F_Com.Text = "";
+            }
         }
 
-        private void F_Add_Click(object sender, EventArgs e)
+        private void dataGridView1_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            string ConnectionString = @"Data Source=" + sPath + ";New=False;Version=3";
-            // находим максимальное значение кода проводок для записи первичного ключа
-            String mValue = "select MAX(IDJournalEntries) from JournalEntries";
-            object maxValue = selectValue(ConnectionString, mValue);
-            if (Convert.ToString(maxValue) == "")
-                maxValue = 0;
-            // Обнулить значения переменных
-            string sum = "0";
-            string count = "0";
-            string coment = null;
-            string Value1 = null;
-            string Value2 = null;
-            string Value3 = null;
-            if (F_Doc.Text != "")
-            {
-                //ОС
-                Value1 = F_Doc.SelectedValue.ToString();
-            }
-            if (F_Agent.Text != "")
-            {
-                //Подразделение
-                Value2 = F_Agent.SelectedValue.ToString();
-            }
-            if (F_Client.Text != "")
-            {
-                //МОЛ
-                Value3 = F_Client.SelectedValue.ToString();
-            }
-
-            //Поле количество
-            if (F_Number.Text != "")
-            {
-                count = F_Number.Text;
-            }
-            //Поиск по базе данных значений
-            String selectCost = "select Cost from OS where IdOS='''" + Value1 + "'''";
-            double Summa = Convert.ToDouble(selectCost) *
-            Convert.ToDouble(count);
-            String selectDT = "select idChart from ChartOfAccounts where Account = '''01'''";
-            object DT = selectValue(ConnectionString, selectDT);
-            String selectKT = "select idChart from ChartOfAccounts where Account = '''00'''";
-            object KT = selectValue(ConnectionString, selectKT);
-            string add = "INSERT INTO JournalEntries (IDJournalEntries, Date, DT, " + "SubkontoDT1, SubkontoDT2, SubkontoDT3, KT, Count, Summa, IDOperation, Comment) VALUES(" + (Convert.ToInt32(maxValue) + 1) +/* dataTimePicker1.Text + */"'," + DT.ToString() + "," + Convert.ToInt32(Value1) + "," + Convert.ToInt32(Value2) + "," + Convert.ToInt32(Value3) + "," + KT.ToString() + "," + Convert.ToDouble(count) + "," + Summa + ", " + Convert.ToInt32(F_Number.Text) + ", " + ",'Поступление ОС','" + ")";
-            ExecuteQuery(add);
-            selectTable(ConnectionString);
-        }
-
-
-        private void F_Clear_Click(object sender, EventArgs e)
-        {
-            F_Doc.SelectedIndex = -1;
-            F_Agent.SelectedIndex = -1;
-            F_Client.SelectedIndex = -1;
-            F_Number.Clear();
-            F_Com.Clear();
+            //выбрана строка CurrentRow
+            int CurrentRow = dataGridView1.SelectedCells[0].RowIndex;
+            //получить значение Name выбранной строки
+            string com = dataGridView1[3, CurrentRow].Value.ToString();
+            F_Com.Text = com;
         }
     }
 }

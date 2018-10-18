@@ -46,5 +46,11 @@ namespace TiPEIS
             var form = new FormLogTransaction();
             form.Show();
         }
+
+        private void журналПроводокToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var form = new FormLogWir();
+            form.Show();
+        }
     }
 }

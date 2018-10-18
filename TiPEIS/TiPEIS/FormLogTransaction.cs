@@ -47,12 +47,18 @@ namespace TiPEIS
         public void selectTable(string ConnectionString, String selectCommand)
         {
             SQLiteConnection connect = new SQLiteConnection(ConnectionString);
-            connect.Open();
+            /*connect.Open();
             SQLiteDataAdapter dataAdapter = new SQLiteDataAdapter(selectCommand, connect);
             DataSet ds = new DataSet();
             dataAdapter.Fill(ds);
             dataGridView1.DataSource = ds;
             dataGridView1.DataMember = ds.Tables[0].ToString();
+            connect.Close();*/
+            connect.Open();
+            SQLiteDataAdapter sda = new SQLiteDataAdapter("SELECT T.Id, T.KindTransaction, T.Date, T.Summa, A.FIO, C.FIO, T.ContractId FROM [LogTransaction] T JOIN Agent A ON T.AgentId = A.Id JOIN Client C ON T.ClientId= C.Id ", connect);
+            DataTable DATA = new DataTable();
+            sda.Fill(DATA);
+            dataGridView1.DataSource = DATA;
             connect.Close();
         }
 
@@ -93,6 +99,9 @@ namespace TiPEIS
             string ConnectionString = @"Data Source=" + sPath + ";New=False;Version=3";
             String selectCommand = "Select * from LogTransaction";
             selectTable(ConnectionString, selectCommand);
+            dataGridView1.Columns[4].HeaderText = "Agent FIO";
+            dataGridView1.Columns[5].HeaderText = "Client FIO";
+            dataGridView1.Columns[6].HeaderText = "Contract №";
         }
 
         private void dataGridView1_RowHeaderMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)

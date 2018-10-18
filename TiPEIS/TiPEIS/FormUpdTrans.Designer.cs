@@ -44,6 +44,7 @@
             this.F_Client = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
             this.F_term = new System.Windows.Forms.TextBox();
+            this.F_Calc = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // F_KindTrans
@@ -93,6 +94,7 @@
             // 
             this.F_summa.Location = new System.Drawing.Point(251, 265);
             this.F_summa.Name = "F_summa";
+            this.F_summa.ReadOnly = true;
             this.F_summa.Size = new System.Drawing.Size(130, 26);
             this.F_summa.TabIndex = 5;
             // 
@@ -185,11 +187,22 @@
             this.F_term.TabIndex = 15;
             this.F_term.Visible = false;
             // 
+            // F_Calc
+            // 
+            this.F_Calc.Location = new System.Drawing.Point(460, 265);
+            this.F_Calc.Name = "F_Calc";
+            this.F_Calc.Size = new System.Drawing.Size(112, 39);
+            this.F_Calc.TabIndex = 16;
+            this.F_Calc.Text = "Рассчитать";
+            this.F_Calc.UseVisualStyleBackColor = true;
+            this.F_Calc.Click += new System.EventHandler(this.F_Calc_Click);
+            // 
             // FormUpdTrans
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1067, 370);
+            this.Controls.Add(this.F_Calc);
             this.Controls.Add(this.F_term);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.F_Client);
@@ -232,5 +245,6 @@
         private System.Windows.Forms.ComboBox F_Client;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox F_term;
+        private System.Windows.Forms.Button F_Calc;
     }
 }
