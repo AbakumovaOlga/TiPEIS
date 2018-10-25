@@ -50,7 +50,6 @@ namespace TiPEIS
             SQLiteConnection connect = new SQLiteConnection(ConnectionString);
             connect.Open();
             SQLiteDataAdapter dataAdapter = new SQLiteDataAdapter(selectCommand, connect);
-            //SQLiteDataAdapter dataAdapter = new SQLiteDataAdapter("SELECT W.Id, W.Summa, W.Date, W.content, W.Deb, A.FIO, C.FIO, W.subkontoDeb3, W.Cred FROM [LogWiring] W JOIN Agent A ON W.subkontoDeb1 = A.Id JOIN Client C ON W.subkontoDeb2= C.Id ", connect);
             DataSet ds = new DataSet();
             dataAdapter.Fill(ds);
             dataGridView1.DataSource = ds;
@@ -58,7 +57,7 @@ namespace TiPEIS
             connect.Close();
         }
 
-        
+
 
         public object selectValue(string ConnectionString, String selectCommand)
         {
@@ -94,7 +93,8 @@ namespace TiPEIS
         private void FormLogWir_Load(object sender, EventArgs e)
         {
             string ConnectionString = @"Data Source=" + sPath + ";New=False;Version=3";
-            String selectCommand = "Select * from LogWiring";
+            // String selectCommand = "Select * from LogWiring";
+            String selectCommand = "select W.Id, W.Summa, W.Date, W.content,  P1.NameAcc as Deb,  A1.FIO as Agent_FIO,  C1.FIO as Client_FIO, D1.Id as Doc_ID_Deb,  P2.NameAcc as Cred,  A2.FIO as Agent_FIO,  C2.FIO as Client_FIO, D2.Id as Doc_ID_Cred, W.LogTrId from LogWiring W left outer join ChartAccounts P1 on(W.Deb = P1.NumberAcc) left outer join ChartAccounts P2 on(W.Cred = P2.NumberAcc) left outer join Agent A1 on(W.subkontoDeb1 = A1.Id) left outer join Agent A2 on(W.subkontoCred1 = A2.Id) left outer join Client C1 on(W.subkontoDeb2 = C1.Id) left outer join Client C2 on(W.subkontoCred2 = C2.Id) left outer join Contract D1 on(W.subkontoDeb2 = D1.Id) left outer join Contract D2 on(W.subkontoCred2 = D2.Id) ";
             selectTable(ConnectionString, selectCommand);
         }
         public void refreshForm(string ConnectionString, String selectCommand)

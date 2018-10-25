@@ -45,6 +45,8 @@
             this.label7 = new System.Windows.Forms.Label();
             this.F_term = new System.Windows.Forms.TextBox();
             this.F_Calc = new System.Windows.Forms.Button();
+            this.F_Wirs = new System.Windows.Forms.DataGridView();
+            ((System.ComponentModel.ISupportInitialize)(this.F_Wirs)).BeginInit();
             this.SuspendLayout();
             // 
             // F_KindTrans
@@ -197,11 +199,24 @@
             this.F_Calc.UseVisualStyleBackColor = true;
             this.F_Calc.Click += new System.EventHandler(this.F_Calc_Click);
             // 
+            // F_Wirs
+            // 
+            this.F_Wirs.AllowUserToAddRows = false;
+            this.F_Wirs.AllowUserToDeleteRows = false;
+            this.F_Wirs.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.F_Wirs.Location = new System.Drawing.Point(55, 389);
+            this.F_Wirs.Name = "F_Wirs";
+            this.F_Wirs.ReadOnly = true;
+            this.F_Wirs.RowTemplate.Height = 28;
+            this.F_Wirs.Size = new System.Drawing.Size(959, 116);
+            this.F_Wirs.TabIndex = 17;
+            // 
             // FormUpdTrans
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1067, 370);
+            this.ClientSize = new System.Drawing.Size(1067, 535);
+            this.Controls.Add(this.F_Wirs);
             this.Controls.Add(this.F_Calc);
             this.Controls.Add(this.F_term);
             this.Controls.Add(this.label7);
@@ -222,6 +237,7 @@
             this.Name = "FormUpdTrans";
             this.Text = "FormUpdTrans";
             this.Load += new System.EventHandler(this.FormUpdTrans_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.F_Wirs)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -246,5 +262,6 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox F_term;
         private System.Windows.Forms.Button F_Calc;
+        private System.Windows.Forms.DataGridView F_Wirs;
     }
 }

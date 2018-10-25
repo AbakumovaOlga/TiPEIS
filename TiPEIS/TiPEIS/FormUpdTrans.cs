@@ -92,12 +92,22 @@ namespace TiPEIS
                 F_Client.SelectedValue = client;
             }
             catch { }
+
             try
             {
                 object doc = selectValue(ConnectionString, "SELECT ContractId FROM LogTransaction WHERE Id=" + Id + ";");
                 F_Contr.SelectedValue = doc;
             }
             catch { }
+
+            try
+            {
+                String selectCommand = "select W.Id, W.Summa, W.Date, W.content,  P1.NameAcc as Deb,  A1.FIO as Agent_FIO,  C1.FIO as Client_FIO, D1.Id as Doc_ID_Deb,  P2.NameAcc as Cred,  A2.FIO as Agent_FIO,  C2.FIO as Client_FIO, D2.Id as Doc_ID_Cred from LogWiring W left outer join ChartAccounts P1 on(W.Deb = P1.NumberAcc) left outer join ChartAccounts P2 on(W.Cred = P2.NumberAcc) left outer join Agent A1 on(W.subkontoDeb1 = A1.Id) left outer join Agent A2 on(W.subkontoCred1 = A2.Id) left outer join Client C1 on(W.subkontoDeb2 = C1.Id) left outer join Client C2 on(W.subkontoCred2 = C2.Id) left outer join Contract D1 on(W.subkontoDeb2 = D1.Id) left outer join Contract D2 on(W.subkontoCred2 = D2.Id) where W.LogTrId="+Id;
+                selectTable(ConnectionString, selectCommand);
+            }
+            catch { }
+
+           
         } 
 
         private int SearchIndexKind(string v)
@@ -136,6 +146,18 @@ namespace TiPEIS
             }
             connect.Close();
             return value;
+        }
+
+        public void selectTable(string ConnectionString, String selectCommand)
+        {
+            SQLiteConnection connect = new SQLiteConnection(ConnectionString);
+            connect.Open();
+            SQLiteDataAdapter dataAdapter = new SQLiteDataAdapter(selectCommand, connect);
+            DataSet ds = new DataSet();
+            dataAdapter.Fill(ds);
+            F_Wirs.DataSource = ds;
+            F_Wirs.DataMember = ds.Tables[0].ToString();
+            connect.Close();
         }
 
         public void selectCombo(string ConnectionString, String selectCommand, ComboBox comboBox, string displayMember, string valueMember)
@@ -228,6 +250,13 @@ namespace TiPEIS
                     RetDoc(idDoc, idAgent, idClient, Date, kind);
                     break;
             }
+
+            try
+            {
+                String selectCommand = "select W.Id, W.Summa, W.Date, W.content,  P1.NameAcc as Deb,  A1.FIO as Agent_FIO_Deb,  C1.FIO as Client_FIO_Deb, D1.Id as Doc_ID_Deb,  P2.NameAcc as Cred,  A2.FIO as Agent_FIO_Cred,  C2.FIO as Client_FIO_Cred, D2.Id as Doc_ID_Cred from LogWiring W left outer join ChartAccounts P1 on(W.Deb = P1.NumberAcc) left outer join ChartAccounts P2 on(W.Cred = P2.NumberAcc) left outer join Agent A1 on(W.subkontoDeb1 = A1.Id) left outer join Agent A2 on(W.subkontoCred1 = A2.Id) left outer join Client C1 on(W.subkontoDeb2 = C1.Id) left outer join Client C2 on(W.subkontoCred2 = C2.Id) left outer join Contract D1 on(W.subkontoDeb2 = D1.Id) left outer join Contract D2 on(W.subkontoCred2 = D2.Id) where W.LogTrId=" + Id;
+                selectTable(ConnectionString, selectCommand);
+            }
+            catch { }
         }
 
         private bool Check()
@@ -382,15 +411,22 @@ namespace TiPEIS
 
               58-51(сумма договора)*/
 
+
+
             //расчет суммы
             double summa = Convert.ToDouble(selectValue(ConnectionString, "SELECT summa FROM Contract WHERE Id=" + idDoc + ";"));
             MessageBox.Show("Итоговая сумма " + summa);
 
             if (Id == 0)//создание
             {
+                String selectCommandTrans = "select MAX(Id) from LogTransaction";
+                object maxValueT = selectValue(ConnectionString, selectCommandTrans);
+                if (Convert.ToString(maxValueT) == "") maxValueT = 0;
+                Id = Convert.ToInt32(maxValueT) + 1;
+
                 //добавить запись в операции
                 string txtSQLQueryT = "insert into LogTransaction (Id, KindTransaction, Date, Summa, AgentId, ClientId, ContractId) values (" +
-                        Id + ", '" + kinds[kind] + "', '" + finishDate + "', " + sumDoc.ToString().Replace(",", ".") + ", " + idAgent + ", " + idClient + ", " + idDoc + ")";
+                        Id + ", '" + kinds[kind] + "', '" + finishDate + "', " + summa.ToString().Replace(",", ".") + ", " + idAgent + ", " + idClient + ", " + idDoc + ")";
                 ExecuteQuery(txtSQLQueryT);
                 MessageBox.Show("Добавлена новая операция");
 
@@ -399,7 +435,7 @@ namespace TiPEIS
                 object maxValueW = selectValue(ConnectionString, selectCommandWir);
                 if (Convert.ToString(maxValueW) == "") maxValueW = 0;
                 string txtSQLQueryW = "insert into LogWiring (Id, Summa, Date, Deb, subkontoDeb1, subkontoDeb2, subkontoDeb3, Cred, LogTrId) values (" +
-                    (Convert.ToInt32(maxValueW) + 1) + ", " + sumDoc.ToString().Replace(",", ".") + ", '" + finishDate + "', '" + 58 + "', " + idAgent + ", " + idClient + ", " + idDoc + ", '" + 51 + "', " + Id + ")";
+                    (Convert.ToInt32(maxValueW) + 1) + ", " + summa.ToString().Replace(",", ".") + ", '" + finishDate + "', '" + 58 + "', " + idAgent + ", " + idClient + ", " + idDoc + ", '" + 51 + "', " + Id + ")";
                 ExecuteQuery(txtSQLQueryW);
                 MessageBox.Show("Добавлена новая проводка");
             }
@@ -542,6 +578,10 @@ namespace TiPEIS
 
         private void F_Calc_Click(object sender, EventArgs e)
         {
+            if (!Check())
+            {
+                return;
+            }
             idDoc = Convert.ToInt32(F_Contr.SelectedValue.ToString());
             string finishDate = F_Date.Value.Date.ToString("yyyy.MM.dd");
             startDate = selectValue(ConnectionString, "SELECT startDate FROM Contract WHERE Id=" + idDoc + ";").ToString();

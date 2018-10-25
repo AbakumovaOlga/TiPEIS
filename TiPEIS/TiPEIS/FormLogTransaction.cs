@@ -19,7 +19,8 @@ namespace TiPEIS
         private SQLiteCommand sql_cmd;
         private DataSet DS = new DataSet();
         private DataTable DT = new DataTable();
-        private string sPath = Path.Combine(Application.StartupPath, "mybd.db");
+        private static string sPath = Path.Combine(Application.StartupPath, "mybd.db");
+        string ConnectionString = @"Data Source=" + sPath + ";New=False;Version=3";
 
         public FormLogTransaction()
         {
@@ -138,10 +139,30 @@ namespace TiPEIS
             int CurrentRow = dataGridView1.SelectedCells[0].RowIndex;
             //получить значение idAgent выбранной строки
             string valueId = dataGridView1[0, CurrentRow].Value.ToString();
+
+            //убираем завершение договора
+            object kind = selectValue(ConnectionString, "select KindTransaction from LogTransaction where Id=" + valueId);
+            if (kind.ToString() == "Закрытие договора - 2")
+            {
+                object doc = selectValue(ConnectionString, "select ContractId from LogTransaction where Id=" + valueId);
+                String selectCommandUpdDoc = "update Contract set finishDate='', termFact=" + 0 + " where Id = " + Convert.ToInt32(doc);
+                changeValue(ConnectionString, selectCommandUpdDoc);
+
+                MessageBox.Show("Договор изменен");
+            }
+
+            //удаление операции
             String selectCommand = "delete from LogTransaction where Id=" + valueId;
-            string ConnectionString = @"Data Source=" + sPath +
-            ";New=False;Version=3";
             changeValue(ConnectionString, selectCommand);
+            MessageBox.Show("Удалена операция");
+
+            //удаление проводки
+            String selectCommandDelWir = "delete from LogWiring where LogTrId=" + valueId;
+            changeValue(ConnectionString, selectCommandDelWir);
+            MessageBox.Show("Удалена проводка");
+
+
+
             //обновление dataGridView1
             selectCommand = "select * from LogTransaction";
             refreshForm(ConnectionString, selectCommand);
@@ -153,7 +174,7 @@ namespace TiPEIS
             string ToDate = F_To.Value.Date.ToString("yyyy.MM.dd");
 
             string ConnectionString = @"Data Source=" + sPath + ";New=False;Version=3";
-            String selectCommand = "Select * from LogTransaction WHERE Date BETWEEN "+ FromDate+" AND "+ ToDate;
+            String selectCommand = "Select * from LogTransaction WHERE Date BETWEEN " + FromDate + " AND " + ToDate;
             selectTable(ConnectionString, selectCommand);
         }
     }
