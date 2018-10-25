@@ -42,10 +42,10 @@ namespace TiPEIS
         private SQLiteCommand sql_cmd;
         private DataSet DS = new DataSet();
         private DataTable DT = new DataTable();
-        private string sPath = Path.Combine(Application.StartupPath, "mybd.db");
+        private static string sPath = Path.Combine(Application.StartupPath, "mybd.db");
 
 
-        string ConnectionString;
+        string ConnectionString = @"Data Source=" + sPath + ";New=False;Version=3";
 
         public FormUpdTrans()
         {

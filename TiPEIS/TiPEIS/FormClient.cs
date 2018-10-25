@@ -20,7 +20,9 @@ namespace TiPEIS
         private SQLiteCommand sql_cmd;
         private DataSet DS = new DataSet();
         private DataTable DT = new DataTable();
-        private string sPath = Path.Combine(Application.StartupPath, "mybd.db");
+        private static string sPath = Path.Combine(Application.StartupPath, "mybd.db");
+        string ConnectionString = @"Data Source=" + sPath +
+            ";New=False;Version=3";
 
         public FormClient()
         {
@@ -117,7 +119,7 @@ namespace TiPEIS
 
         private void F_Add_Click(object sender, EventArgs e)
         {
-            
+
             string ConnectionString = @"Data Source=" + sPath + ";New=False;Version=3";
             String selectCommand = "select MAX(Id) from Client";
             object maxValue = selectValue(ConnectionString, selectCommand);
@@ -163,6 +165,9 @@ namespace TiPEIS
 
         private void F_Delete_Click(object sender, EventArgs e)
         {
+            Dop();
+            // НЕ УДАЛЯТЬ
+            /*
             if (dataGridView1.SelectedRows.Count != 1)
             {
                 return;
@@ -178,7 +183,39 @@ namespace TiPEIS
             //обновление dataGridView1
             selectCommand = "select * from Client";
             refreshForm(ConnectionString, selectCommand);
-            F_value.Text = "";
+            F_value.Text = "";*/
+        }
+
+        private void Dop()
+        {
+            int CurrentRow = dataGridView1.SelectedCells[0].RowIndex;
+            //получить значение idAgent выбранной строки
+            string valueId = dataGridView1[0, CurrentRow].Value.ToString();
+            object res = selectValue(ConnectionString, "SELECT Id FROM LogTransaction WHERE ClientId=" + valueId + ";");
+            if (res.ToString() != "")
+            {
+                var form = new FormDel(Convert.ToInt32(valueId), "Client");
+                form.Show();
+            }
+            else
+            {
+                if (dataGridView1.SelectedRows.Count != 1)
+                {
+                    return;
+                }
+                // выбрана строка CurrentRow
+
+                //получить значение idAgent выбранной строки
+
+                String selectCommand = "delete from Client where Id=" + valueId;
+                string ConnectionString = @"Data Source=" + sPath +
+                ";New=False;Version=3";
+                changeValue(ConnectionString, selectCommand);
+                //обновление dataGridView1
+                selectCommand = "select * from Client";
+                refreshForm(ConnectionString, selectCommand);
+                F_value.Text = "";
+            }
         }
     }
 }

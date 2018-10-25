@@ -20,7 +20,9 @@ namespace TiPEIS
         private SQLiteCommand sql_cmd;
         private DataSet DS = new DataSet();
         private DataTable DT = new DataTable();
-        private string sPath = Path.Combine(Application.StartupPath, "mybd.db");
+        private static string sPath = Path.Combine(Application.StartupPath, "mybd.db");
+        string ConnectionString = @"Data Source=" + sPath +
+           ";New=False;Version=3";
 
         public FormAgent()
         {
@@ -37,8 +39,7 @@ namespace TiPEIS
 
         private void ExecuteQuery(string txtQuery)
         {
-            sql_con = new SQLiteConnection("Data Source=" + sPath +
-            ";Version=3;New=False;Compress=True;");
+            sql_con = new SQLiteConnection("Data Source=" + sPath + ";Version=3;New=False;Compress=True;");
             sql_con.Open();
             sql_cmd = sql_con.CreateCommand();
             sql_cmd.CommandText = txtQuery;
@@ -164,22 +165,57 @@ namespace TiPEIS
 
         private void F_Delete_Click(object sender, EventArgs e)
         {
-            if (dataGridView1.SelectedRows.Count != 1)
-            {
-                return;
-            }
-            // выбрана строка CurrentRow
+            Dop();
+            // НЕ УДАЛЯТЬ
+            //если убрать доп
+            /* if (dataGridView1.SelectedRows.Count != 1)
+             {
+                 return;
+             }
+             // выбрана строка CurrentRow
+             int CurrentRow = dataGridView1.SelectedCells[0].RowIndex;
+             //получить значение idAgent выбранной строки
+             string valueId = dataGridView1[0, CurrentRow].Value.ToString();
+             String selectCommand = "delete from Agent where Id=" + valueId;
+             string ConnectionString = @"Data Source=" + sPath +
+             ";New=False;Version=3";
+             changeValue(ConnectionString, selectCommand);
+             //обновление dataGridView1
+             selectCommand = "select * from Agent";
+             refreshForm(ConnectionString, selectCommand);
+             F_value.Text = "";*/
+        }
+
+        private void Dop()
+        {
             int CurrentRow = dataGridView1.SelectedCells[0].RowIndex;
             //получить значение idAgent выбранной строки
             string valueId = dataGridView1[0, CurrentRow].Value.ToString();
-            String selectCommand = "delete from Agent where Id=" + valueId;
-            string ConnectionString = @"Data Source=" + sPath +
-            ";New=False;Version=3";
-            changeValue(ConnectionString, selectCommand);
-            //обновление dataGridView1
-            selectCommand = "select * from Agent";
-            refreshForm(ConnectionString, selectCommand);
-            F_value.Text = "";
+            object res = selectValue(ConnectionString, "SELECT Id FROM LogTransaction WHERE AgentId=" + valueId + ";");
+            if (res.ToString()!="")
+            {
+                var form = new FormDel(Convert.ToInt32(valueId), "Agent");
+                form.Show();
+            }
+            else
+            {
+                if (dataGridView1.SelectedRows.Count != 1)
+                {
+                    return;
+                }
+                // выбрана строка CurrentRow
+                
+                //получить значение idAgent выбранной строки
+               
+                String selectCommand = "delete from Agent where Id=" + valueId;
+                string ConnectionString = @"Data Source=" + sPath +
+                ";New=False;Version=3";
+                changeValue(ConnectionString, selectCommand);
+                //обновление dataGridView1
+                selectCommand = "select * from Agent";
+                refreshForm(ConnectionString, selectCommand);
+                F_value.Text = "";
+            }
         }
     }
 }

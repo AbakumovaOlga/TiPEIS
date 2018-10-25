@@ -18,7 +18,9 @@ namespace TiPEIS
         private SQLiteCommand sql_cmd;
         private DataSet DS = new DataSet();
         private DataTable DT = new DataTable();
-        private string sPath = Path.Combine(Application.StartupPath, "mybd.db");
+        private static string sPath = Path.Combine(Application.StartupPath, "mybd.db");
+        string ConnectionString = @"Data Source=" + sPath +
+            ";New=False;Version=3";
 
         public FormContract()
         {
@@ -103,6 +105,10 @@ namespace TiPEIS
 
         private void F_Delete_Click(object sender, EventArgs e)
         {
+            Dop();
+            // НЕ УДАЛЯТЬ
+            //если удален доп
+            /*
             if (dataGridView1.SelectedRows.Count != 1)
             {
                 return;
@@ -117,8 +123,9 @@ namespace TiPEIS
             changeValue(ConnectionString, selectCommand);
             //обновление dataGridView1
             selectCommand = "select * from Contract";
-            refreshForm(ConnectionString, selectCommand);
+            refreshForm(ConnectionString, selectCommand);*/
         }
+
 
         public void changeValue(string ConnectionString, String selectCommand)
         {
@@ -134,5 +141,32 @@ namespace TiPEIS
             trans.Commit();
             connect.Close();
         }
-    }
+        private void Dop()
+        {
+            int CurrentRow = dataGridView1.SelectedCells[0].RowIndex;
+            //получить значение idAgent выбранной строки
+            string valueId = dataGridView1[0, CurrentRow].Value.ToString();
+            object res = selectValue(ConnectionString, "SELECT Id FROM LogTransaction WHERE ContractId=" + valueId + ";");
+            if (res.ToString() != "")
+            {
+                var form = new FormDel(Convert.ToInt32(valueId), "Contract");
+                form.Show();
+            }
+            else
+            {
+                if (dataGridView1.SelectedRows.Count != 1)
+                {
+                    return;
+                }
+
+                String selectCommand = "delete from Contract where Id=" + valueId;
+                string ConnectionString = @"Data Source=" + sPath +
+                ";New=False;Version=3";
+                changeValue(ConnectionString, selectCommand);
+                //обновление dataGridView1
+                selectCommand = "select * from Contract";
+                refreshForm(ConnectionString, selectCommand);
+            }
+        }
+        }
 }
