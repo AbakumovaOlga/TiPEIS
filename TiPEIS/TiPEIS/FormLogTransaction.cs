@@ -55,7 +55,7 @@ namespace TiPEIS
             dataGridView1.DataMember = ds.Tables[0].ToString();
             connect.Close();*/
             connect.Open();
-            SQLiteDataAdapter sda = new SQLiteDataAdapter("SELECT T.Id, T.KindTransaction, T.Date, T.Summa, A.FIO, C.FIO, T.ContractId FROM [LogTransaction] T JOIN Agent A ON T.AgentId = A.Id JOIN Client C ON T.ClientId= C.Id ", connect);
+            SQLiteDataAdapter sda = new SQLiteDataAdapter("SELECT T.Id, T.KindTransaction, T.Date, T.Summa, A.FIO, C.FIO, T.ContractId FROM [LogTransaction] T left outer join Agent A ON T.AgentId = A.Id left outer join Client C ON T.ClientId= C.Id ", connect);
             DataTable DATA = new DataTable();
             sda.Fill(DATA);
             dataGridView1.DataSource = DATA;

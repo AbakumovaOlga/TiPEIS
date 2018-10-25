@@ -60,6 +60,58 @@ namespace TiPEIS
             Id = id;
         }
 
+        private void LoadDate() // подгрузка данных по текущей операции
+        {
+            try
+            {
+                object kind = selectValue(ConnectionString, "SELECT KindTransaction FROM LogTransaction WHERE Id=" + Id + ";");
+                F_KindTrans.SelectedIndex = SearchIndexKind(kind.ToString());
+            }
+            catch { }
+            try
+            {
+                object date = selectValue(ConnectionString, "SELECT Date FROM LogTransaction WHERE Id=" + Id + ";");
+                F_Date.Value = Convert.ToDateTime(date.ToString());
+            }
+            catch { }
+            try
+            {
+                object summa = selectValue(ConnectionString, "SELECT Summa FROM LogTransaction WHERE Id=" + Id + ";");
+                F_summa.Text = summa.ToString();
+            }
+            catch { }
+            try
+            {
+                object agent = selectValue(ConnectionString, "SELECT AgentId FROM LogTransaction WHERE Id=" + Id + ";");
+                F_Agent.SelectedValue = agent;
+            }
+            catch { }
+            try
+            {
+                object client = selectValue(ConnectionString, "SELECT ClientId FROM LogTransaction WHERE Id=" + Id + ";");
+                F_Client.SelectedValue = client;
+            }
+            catch { }
+            try
+            {
+                object doc = selectValue(ConnectionString, "SELECT ContractId FROM LogTransaction WHERE Id=" + Id + ";");
+                F_Contr.SelectedValue = doc;
+            }
+            catch { }
+        } 
+
+        private int SearchIndexKind(string v)
+        {
+            for (int i = 0; i < kinds.Length; i++)
+            {
+                if (kinds[i] == v)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
         private void ExecuteQuery(string txtQuery)
         {
             sql_con = new SQLiteConnection("Data Source=" + sPath + ";Version=3;New=False;Compress=True;");
@@ -129,11 +181,28 @@ namespace TiPEIS
             String selectContracts = "SELECT Id FROM Contract";
             selectCombo(ConnectionString, selectContracts, F_Contr, "Id", "Id");
 
+            F_KindTrans.SelectedIndex = -1;
+            F_Agent.SelectedIndex = -1;
+            F_Client.SelectedIndex = -1;
+            F_Contr.SelectedIndex = -1;
+            
             F_KindTrans.DataSource = kinds;
+
+            if (Id != 0)
+            {
+                LoadDate();
+            }
         }
 
         private void F_Save_Click(object sender, EventArgs e)
         {
+
+            if (!Check())
+            {
+                MessageBox.Show("Заполните все поля!");
+                return;
+            }
+
             idDoc = Convert.ToInt32(F_Contr.SelectedValue.ToString());
 
             idAgent = Convert.ToInt32(F_Agent.SelectedValue.ToString());
@@ -161,6 +230,15 @@ namespace TiPEIS
             }
         }
 
+        private bool Check()
+        {
+            if (F_Contr.SelectedValue == null) return false;
+            if (F_Agent.SelectedValue == null) return false;
+            if (F_Client.SelectedValue == null) return false;
+
+            return true;
+        } //все комбо-боксы выбраны
+
         private void RetDoc(int idDoc, int idAgent, int idClient, string finishDate, int kind)
         {
             /*операция возврата денежных средств по ранее
@@ -168,34 +246,59 @@ namespace TiPEIS
             счетов денежных средств на сумму займа, увеличенную на сумму начисленного
             процента по договору.
             51-58*/
-            //  throw new NotImplementedException();
 
-           // idDoc = Convert.ToInt32(F_Contr.SelectedValue.ToString());
-
-
-            //расчет суммы+
+            //расчет суммы+проценты
             object summa = selectValue(ConnectionString, "SELECT summa FROM Contract WHERE Id=" + idDoc + ";");
-            sumDoc = CalcSum()+Convert.ToDouble(summa);
+            sumDoc = CalcSum() + Convert.ToDouble(summa);
             MessageBox.Show("Итоговая сумма " + sumDoc);
+            
+            if (Id == 0) //новая операция
+            {
+                String selectCommandTrans = "select MAX(Id) from LogTransaction";
+                object maxValueT = selectValue(ConnectionString, selectCommandTrans);
+                if (Convert.ToString(maxValueT) == "") maxValueT = 0;
+                Id = Convert.ToInt32(maxValueT) + 1;
 
-            //добавить запись в операции
-            String selectCommandTrans = "select MAX(Id) from LogTransaction";
-            object maxValueT = selectValue(ConnectionString, selectCommandTrans);
-            if (Convert.ToString(maxValueT) == "") maxValueT = 0;
-            Id = Convert.ToInt32(maxValueT) + 1;
-            string txtSQLQueryT = "insert into LogTransaction (Id, KindTransaction, Date, Summa, AgentId, ClientId, ContractId) values (" +
+                //добавить запись в операции
+                string txtSQLQueryTN = "insert into LogTransaction (Id, KindTransaction, Date, Summa, AgentId, ClientId, ContractId) values (" +
                     Id + ", '" + kinds[kind] + "', '" + finishDate + "', " + sumDoc.ToString().Replace(",", ".") + ", " + idAgent + ", " + idClient + ", " + idDoc + ")";
-            ExecuteQuery(txtSQLQueryT);
-            MessageBox.Show("Добавлена новая операция");
+                ExecuteQuery(txtSQLQueryTN);
+                MessageBox.Show("Добавлена новая операция");
 
-            //добавить проводку 51-58
-            String selectCommandWir = "select MAX(Id) from LogWiring";
-            object maxValueW = selectValue(ConnectionString, selectCommandWir);
-            if (Convert.ToString(maxValueW) == "") maxValueW = 0;
-            string txtSQLQueryW = "insert into LogWiring (Id, Summa, Date, Deb, Cred,  subkontoCred1, subkontoCred2, subkontoCred3, LogTrId) values (" +
-        (Convert.ToInt32(maxValueW) + 1) + ", " + sumDoc.ToString().Replace(",", ".") + ", '" + finishDate + "', '" + 51+ "', '"+58+"', " + idAgent + ", " + idClient + ", " + idDoc + ", " + Id + ")";
-            ExecuteQuery(txtSQLQueryW);
-            MessageBox.Show("Добавлена новая проводка");
+                //добавить проводку 51-58
+                String selectCommandWir = "select MAX(Id) from LogWiring";
+                object maxValueW = selectValue(ConnectionString, selectCommandWir);
+                if (Convert.ToString(maxValueW) == "") maxValueW = 0;
+                string txtSQLQueryW = "insert into LogWiring (Id, Summa, Date, Deb, Cred,  subkontoCred1, subkontoCred2, subkontoCred3, LogTrId) values (" +
+                    (Convert.ToInt32(maxValueW) + 1) + ", " + sumDoc.ToString().Replace(",", ".") + ", '" + finishDate + "', '" + 51 + "', '" + 58 + "', " + idAgent + ", " + idClient + ", " + idDoc + ", " + Id + ")";
+                ExecuteQuery(txtSQLQueryW);
+                MessageBox.Show("Добавлена новая проводка");
+            }
+            else //Изменение
+            {
+                String selectCommandTU = "update LogTransaction set " +
+                  "KindTransaction='" + kinds[kind] + "'" +
+                    ", Date='" + finishDate + "'" +
+                    ", Summa=" + sumDoc.ToString().Replace(",", ".") +
+                    ", AgentId=" + idAgent +
+                    ", ClientId='" + idClient +
+                    "', ContractId=" + idDoc
+                    + " where Id = " + Id;
+                changeValue(ConnectionString, selectCommandTU);
+                MessageBox.Show("Операция изменена");
+
+                String selectCommandWU = "update LogWiring set " +
+                  "Summa=" + sumDoc.ToString().Replace(",", ".") +
+                    ", Date='" + finishDate + "'" +
+                    ", Deb='" + 51 + "'" +
+                    ", Cred='" + 58 + "'" +
+                    ", subkontoCred1=" + idAgent +
+                    ", subkontoCred2=" + idClient +
+                    ", subkontoCred3=" + idDoc
+                    + " where LogTrId = " + Id;
+                changeValue(ConnectionString, selectCommandWU);
+                MessageBox.Show("Проводка изменена");
+            }
         }
 
         private void CloseDoc(int idDoc, int idAgent, int idClient, string finishDate, int kind)
@@ -209,69 +312,65 @@ namespace TiPEIS
             СуммаПроводки=Договор.Процент1*Договор.СуммаДоговора, иначе
             СуммаПроводки=Договор.Процент2*Договор.СуммаДоговора.
             58-84 (начисленные проценты)*/
-
-            /*sumDoc = Convert.ToDouble(selectValue(ConnectionString, "SELECT summa FROM Contract WHERE Id=" + idDoc + ";").ToString());
-
-            startDate = selectValue(ConnectionString, "SELECT startDate FROM Contract WHERE Id=" + idDoc + ";").ToString();
-
-            term = Convert.ToInt32(selectValue(ConnectionString, "SELECT term FROM Contract WHERE Id=" + idDoc + ";").ToString());
-
-            percent1 = Convert.ToDouble((selectValue(ConnectionString, "SELECT percent1 FROM Contract WHERE Id=" + idDoc + ";")).ToString().Replace(".", ","));
-            percent2 = Convert.ToDouble((selectValue(ConnectionString, "SELECT percent2 FROM Contract WHERE Id=" + idDoc + ";")).ToString().Replace(".", ","));
-
-            if (Convert.ToDateTime(startDate) > Convert.ToDateTime(finishDate))
-            {
-                MessageBox.Show("Проверьте дату");
-                return;
-            }
-
-            int termfact = Convert.ToInt32((Convert.ToDateTime(finishDate) - Convert.ToDateTime(startDate)).TotalDays); //финиш-старт =фактический срок
-            if (termfact > term) //факт>срока -> срок истек
-            {
-                if (percent1 != 0)
-                    sumDoc = Convert.ToDouble(sumDoc) * percent1;
-            }
-            else
-            {
-                if (percent2 != 0)
-                    sumDoc = Convert.ToDouble(sumDoc) * percent2;
-            }
-            */
-
-
+            
             //расчет суммы
             sumDoc = CalcSum();
             MessageBox.Show("Итоговая сумма " + sumDoc);
 
-            //добавить запись в операции
-            String selectCommandTrans = "select MAX(Id) from LogTransaction";
-            object maxValueT = selectValue(ConnectionString, selectCommandTrans);
-            if (Convert.ToString(maxValueT) == "") maxValueT = 0;
-            Id = Convert.ToInt32(maxValueT) + 1;
-            string txtSQLQueryT = "insert into LogTransaction (Id, KindTransaction, Date, Summa, AgentId, ClientId, ContractId) values (" +
-                    Id + ", '" + kinds[kind] + "', '" + finishDate + "', " + sumDoc.ToString().Replace(",", ".") + ", " + idAgent + ", " + idClient + ", " + idDoc + ")";
-            ExecuteQuery(txtSQLQueryT);
-            MessageBox.Show("Добавлена новая операция");
+            if (Id == 0)
+            {
+                String selectCommandTrans = "select MAX(Id) from LogTransaction";
+                object maxValueT = selectValue(ConnectionString, selectCommandTrans);
+                if (Convert.ToString(maxValueT) == "") maxValueT = 0;
+                Id = Convert.ToInt32(maxValueT) + 1;
 
-            //добавить проводку 58-84
-            String selectCommandWir = "select MAX(Id) from LogWiring";
-            object maxValueW = selectValue(ConnectionString, selectCommandWir);
-            if (Convert.ToString(maxValueW) == "") maxValueW = 0;
-            string txtSQLQueryW = "insert into LogWiring (Id, Summa, Date, Deb, subkontoDeb1, subkontoDeb2, subkontoDeb3, Cred, LogTrId) values (" +
-        (Convert.ToInt32(maxValueW) + 1) + ", " + sumDoc.ToString().Replace(",", ".") + ", '" + finishDate + "', '" + 58 + "', " + idAgent + ", " + idClient + ", " + idDoc + ", '" + 84 + "', "+ Id + ")";
-            ExecuteQuery(txtSQLQueryW);
-            MessageBox.Show("Добавлена новая проводка");
+                //добавить запись в операции
+                string txtSQLQueryTN = "insert into LogTransaction (Id, KindTransaction, Date, Summa, AgentId, ClientId, ContractId) values (" +
+                        Id + ", '" + kinds[kind] + "', '" + finishDate + "', " + sumDoc.ToString().Replace(",", ".") + ", " + idAgent + ", " + idClient + ", " + idDoc + ")";
+                ExecuteQuery(txtSQLQueryTN);
+                MessageBox.Show("Добавлена новая операция");
+
+                //добавить проводку 58-84
+                String selectCommandWN = "select MAX(Id) from LogWiring";
+                object maxValueW = selectValue(ConnectionString, selectCommandWN);
+                if (Convert.ToString(maxValueW) == "") maxValueW = 0;
+                string txtSQLQueryW = "insert into LogWiring (Id, Summa, Date, Deb, subkontoDeb1, subkontoDeb2, subkontoDeb3, Cred, LogTrId) values (" +
+                    (Convert.ToInt32(maxValueW) + 1) + ", " + sumDoc.ToString().Replace(",", ".") + ", '" + finishDate + "', '" + 58 + "', " + idAgent + ", " + idClient + ", " + idDoc + ", '" + 84 + "', " + Id + ")";
+                ExecuteQuery(txtSQLQueryW);
+                MessageBox.Show("Добавлена новая проводка");
+
+            }
+            else
+            {
+                String selectCommandTU = "update LogTransaction set " +
+                  "KindTransaction='" + kinds[kind] + "'" +
+                    ", Date='" + finishDate + "'" +
+                    ", Summa=" + sumDoc.ToString().Replace(",", ".") +
+                    ", AgentId=" + idAgent +
+                    ", ClientId='" + idClient +
+                    "', ContractId=" + idDoc
+                    + " where Id = " + Id;
+                changeValue(ConnectionString, selectCommandTU);
+                MessageBox.Show("Операция изменена");
+
+                String selectCommandWU = "update LogWiring set " +
+                  "Summa=" + sumDoc.ToString().Replace(",", ".") +
+                    ", Date='" + finishDate + "'" +
+                    ", Deb='" + 58 + "'" +
+                    ", Cred='" + 84 + "'" +
+                    ", subkontoDeb1=" + idAgent +
+                    ", subkontoDeb2=" + idClient +
+                    ", subkontoDeb3=" + idDoc
+                    + " where LogTrId = " + Id;
+                changeValue(ConnectionString, selectCommandWU);
+                MessageBox.Show("Проводка изменена");
+            }
 
             //обновить договор
             int termfact = Convert.ToInt32((Convert.ToDateTime(finishDate) - Convert.ToDateTime(startDate)).TotalDays); //финиш-старт =фактический срок
             String selectCommandUpdDoc = "update Contract set finishDate='" + finishDate + "', termFact=" + termfact + " where Id = " + idDoc;
             changeValue(ConnectionString, selectCommandUpdDoc);
             MessageBox.Show("Договор обновлен");
-
-
-
-
-            //throw new NotImplementedException();
         }
 
         private void PayDoc(int idDoc, int idAgent, int idClient, string finishDate, int kind)
@@ -280,18 +379,16 @@ namespace TiPEIS
               кредита счета денежных средств на сумму перечисления. Каждый вид займа 
               учитывается на отдельном субсчете. Проводка должна быть сформирована 
               автоматически после ввода даты операции и выбора договора займа.
+
               58-51(сумма договора)*/
+
+            //расчет суммы
+            double summa = Convert.ToDouble(selectValue(ConnectionString, "SELECT summa FROM Contract WHERE Id=" + idDoc + ";"));
+            MessageBox.Show("Итоговая сумма " + summa);
+
             if (Id == 0)//создание
             {
-                //расчет суммы
-                double summa = Convert.ToDouble(selectValue(ConnectionString, "SELECT summa FROM Contract WHERE Id=" + idDoc + ";"));
-                MessageBox.Show("Итоговая сумма " + summa);
-
                 //добавить запись в операции
-                String selectCommandTrans = "select MAX(Id) from LogTransaction";
-                object maxValueT = selectValue(ConnectionString, selectCommandTrans);
-                if (Convert.ToString(maxValueT) == "") maxValueT = 0;
-                Id = Convert.ToInt32(maxValueT) + 1;
                 string txtSQLQueryT = "insert into LogTransaction (Id, KindTransaction, Date, Summa, AgentId, ClientId, ContractId) values (" +
                         Id + ", '" + kinds[kind] + "', '" + finishDate + "', " + sumDoc.ToString().Replace(",", ".") + ", " + idAgent + ", " + idClient + ", " + idDoc + ")";
                 ExecuteQuery(txtSQLQueryT);
@@ -302,30 +399,35 @@ namespace TiPEIS
                 object maxValueW = selectValue(ConnectionString, selectCommandWir);
                 if (Convert.ToString(maxValueW) == "") maxValueW = 0;
                 string txtSQLQueryW = "insert into LogWiring (Id, Summa, Date, Deb, subkontoDeb1, subkontoDeb2, subkontoDeb3, Cred, LogTrId) values (" +
-            (Convert.ToInt32(maxValueW) + 1) + ", " + sumDoc.ToString().Replace(",", ".") + ", '" + finishDate + "', '" + 58 + "', " + idAgent + ", " + idClient + ", " + idDoc + ", '" + 51 + "', " + Id + ")";
+                    (Convert.ToInt32(maxValueW) + 1) + ", " + sumDoc.ToString().Replace(",", ".") + ", '" + finishDate + "', '" + 58 + "', " + idAgent + ", " + idClient + ", " + idDoc + ", '" + 51 + "', " + Id + ")";
                 ExecuteQuery(txtSQLQueryW);
                 MessageBox.Show("Добавлена новая проводка");
             }
             else
             {
-                //расчет суммы
-                double summa = Convert.ToDouble(selectValue(ConnectionString, "SELECT summa FROM Contract WHERE Id=" + idDoc + ";"));
-                MessageBox.Show("Итоговая сумма " + summa);
+                String selectCommandTU = "update LogTransaction set " +
+                  "KindTransaction='" + kinds[kind] + "'" +
+                    ", Date='" + finishDate + "'" +
+                    ", Summa=" + summa.ToString().Replace(",", ".") +
+                    ", AgentId=" + idAgent +
+                    ", ClientId='" + idClient +
+                    "', ContractId=" + idDoc
+                    + " where Id = " + Id;
+                changeValue(ConnectionString, selectCommandTU);
+                MessageBox.Show("Операция изменена");
 
-                //изменить запись в операции
-                string txtSQLQueryT = "insert into LogTransaction (Id, KindTransaction, Date, Summa, AgentId, ClientId, ContractId) values (" +
-                        Id + ", '" + kinds[kind] + "', '" + finishDate + "', " + sumDoc.ToString().Replace(",", ".") + ", " + idAgent + ", " + idClient + ", " + idDoc + ")";
-                ExecuteQuery(txtSQLQueryT);
-                MessageBox.Show("Добавлена новая операция");
-
-                //изменить проводку 58-51
-                String idWir = "select Id from LogWiring where LogTrId=" + Id + ";";
-                string txtSQLQueryW = "insert into LogWiring (Id, Summa, Date, Deb, subkontoDeb1, subkontoDeb2, subkontoDeb3, Cred, LogTrId) values (" +
-            idWir + ", " + sumDoc.ToString().Replace(",", ".") + ", '" + finishDate + "', '" + 58 + "', " + idAgent + ", " + idClient + ", " + idDoc + ", '" + 51 + "', " + Id + ")";
-                ExecuteQuery(txtSQLQueryW);
-                MessageBox.Show("Добавлена новая проводка");
+                String selectCommandWU = "update LogWiring set " +
+                  "Summa=" + summa.ToString().Replace(",", ".") +
+                    ", Date='" + finishDate + "'" +
+                    ", Deb='" + 58 + "'" +
+                    ", Cred='" + 84 + "'" +
+                    ", subkontoDeb1=" + idAgent +
+                    ", subkontoDeb2=" + idClient +
+                    ", subkontoDeb3=" + idDoc
+                    + " where LogTrId = " + Id;
+                changeValue(ConnectionString, selectCommandWU);
+                MessageBox.Show("Проводка изменена");
             }
-            // throw new NotImplementedException();
         }
 
         private void CreateDoc(string startDate)
@@ -403,14 +505,17 @@ namespace TiPEIS
                 return;
             }
 
-            String selectCommand = "select MAX(Id) from Contract";
-            object maxValue = selectValue(ConnectionString, selectCommand);
-            if (Convert.ToString(maxValue) == "")
-                maxValue = 0;
-            string txtSQLQuery = "insert into Contract (Id, startDate,term,summa,termFact,finishDate,percent1,percent2) values (" +
-                (Convert.ToInt32(maxValue) + 1) + ", '" + startDate + "', " + term + ", " + summa + ", " + 0 + ", '" + "" + "', " + 0 + ", " + 0 + ")";
-            ExecuteQuery(txtSQLQuery);
-            MessageBox.Show("Успешно");
+            if (Id == 0)
+            {
+                String selectCommand = "select MAX(Id) from Contract";
+                object maxValue = selectValue(ConnectionString, selectCommand);
+                if (Convert.ToString(maxValue) == "")
+                    maxValue = 0;
+                string txtSQLQuery = "insert into Contract (Id, startDate,term,summa,termFact,finishDate,percent1,percent2) values (" +
+                    (Convert.ToInt32(maxValue) + 1) + ", '" + startDate + "', " + term + ", " + summa + ", " + 0 + ", '" + "" + "', " + 0 + ", " + 0 + ")";
+                ExecuteQuery(txtSQLQuery);
+                MessageBox.Show("Новый договор успешно создан");
+            }
         }
 
         private void F_Cancel_Click(object sender, EventArgs e)
@@ -477,8 +582,8 @@ namespace TiPEIS
                 MessageBox.Show("Проверьте дату");
                 return;
             }
-            
-            
+
+
             switch (kind)
             {
                 case 0:
@@ -490,7 +595,7 @@ namespace TiPEIS
                     F_summa.Text = CalcSum().ToString();
                     break;
                 case 3:
-                    F_summa.Text = (CalcSum()+summa).ToString();
+                    F_summa.Text = (CalcSum() + summa).ToString();
                     break;
             }
         }
