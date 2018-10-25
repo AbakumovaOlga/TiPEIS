@@ -123,8 +123,9 @@ namespace TiPEIS
             int CurrentRow = dataGridView1.SelectedCells[0].RowIndex;
             //получить значение Name выбранной строки
             string valueId = dataGridView1[0, CurrentRow].Value.ToString();
+           
             string changeName = F_Com.Text;
-            //обновление Name
+            //обновление comment
             if (CheckValue())
             {
                 String selectCommand = "update LogWiring set content='" + changeName + "' where Id = " + valueId;

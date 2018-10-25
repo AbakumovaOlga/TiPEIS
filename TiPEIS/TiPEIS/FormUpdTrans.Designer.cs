@@ -63,27 +63,27 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(51, 55);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(116, 20);
+            this.label1.Size = new System.Drawing.Size(129, 20);
             this.label1.TabIndex = 1;
-            this.label1.Text = "Вид операции";
+            this.label1.Text = "Kind of operation";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(55, 190);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(48, 20);
+            this.label2.Size = new System.Drawing.Size(44, 20);
             this.label2.TabIndex = 2;
-            this.label2.Text = "Дата";
+            this.label2.Text = "Date";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(51, 271);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(58, 20);
+            this.label3.Size = new System.Drawing.Size(64, 20);
             this.label3.TabIndex = 3;
-            this.label3.Text = "Сумма";
+            this.label3.Text = "Summa";
             // 
             // F_Date
             // 
@@ -102,7 +102,7 @@
             // 
             // F_Save
             // 
-            this.F_Save.Location = new System.Drawing.Point(757, 296);
+            this.F_Save.Location = new System.Drawing.Point(848, 348);
             this.F_Save.Name = "F_Save";
             this.F_Save.Size = new System.Drawing.Size(92, 35);
             this.F_Save.TabIndex = 6;
@@ -112,7 +112,7 @@
             // 
             // F_Cancel
             // 
-            this.F_Cancel.Location = new System.Drawing.Point(872, 296);
+            this.F_Cancel.Location = new System.Drawing.Point(963, 348);
             this.F_Cancel.Name = "F_Cancel";
             this.F_Cancel.Size = new System.Drawing.Size(92, 35);
             this.F_Cancel.TabIndex = 7;
@@ -125,27 +125,27 @@
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(725, 45);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(73, 20);
+            this.label4.Size = new System.Drawing.Size(70, 20);
             this.label4.TabIndex = 8;
-            this.label4.Text = "Договор";
+            this.label4.Text = "Contract";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(725, 122);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(54, 20);
+            this.label5.Size = new System.Drawing.Size(52, 20);
             this.label5.TabIndex = 9;
-            this.label5.Text = "Агент";
+            this.label5.Text = "Agent";
             // 
             // label6
             // 
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(725, 201);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(65, 20);
+            this.label6.Size = new System.Drawing.Size(49, 20);
             this.label6.TabIndex = 10;
-            this.label6.Text = "Клиент";
+            this.label6.Text = "Client";
             // 
             // F_Contr
             // 
@@ -176,9 +176,9 @@
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(298, 122);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(46, 20);
+            this.label7.Size = new System.Drawing.Size(45, 20);
             this.label7.TabIndex = 14;
-            this.label7.Text = "Срок";
+            this.label7.Text = "Term";
             this.label7.Visible = false;
             // 
             // F_term
@@ -195,7 +195,7 @@
             this.F_Calc.Name = "F_Calc";
             this.F_Calc.Size = new System.Drawing.Size(112, 39);
             this.F_Calc.TabIndex = 16;
-            this.F_Calc.Text = "Рассчитать";
+            this.F_Calc.Text = "Calc";
             this.F_Calc.UseVisualStyleBackColor = true;
             this.F_Calc.Click += new System.EventHandler(this.F_Calc_Click);
             // 
@@ -204,11 +204,11 @@
             this.F_Wirs.AllowUserToAddRows = false;
             this.F_Wirs.AllowUserToDeleteRows = false;
             this.F_Wirs.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.F_Wirs.Location = new System.Drawing.Point(55, 389);
+            this.F_Wirs.Location = new System.Drawing.Point(12, 389);
             this.F_Wirs.Name = "F_Wirs";
             this.F_Wirs.ReadOnly = true;
             this.F_Wirs.RowTemplate.Height = 28;
-            this.F_Wirs.Size = new System.Drawing.Size(959, 116);
+            this.F_Wirs.Size = new System.Drawing.Size(1043, 134);
             this.F_Wirs.TabIndex = 17;
             // 
             // FormUpdTrans

@@ -40,12 +40,12 @@ namespace TiPEIS
 
         public void refreshForm(string ConnectionString, String selectCommand)
         {
-            selectTable(ConnectionString, selectCommand);
+            selectTableAll(ConnectionString, selectCommand);
             dataGridView1.Update();
             dataGridView1.Refresh();
         }
 
-        public void selectTable(string ConnectionString, String selectCommand)
+        public void selectTableAll(string ConnectionString, String selectCommand)
         {
             SQLiteConnection connect = new SQLiteConnection(ConnectionString);
             /*connect.Open();
@@ -99,7 +99,7 @@ namespace TiPEIS
         {
             string ConnectionString = @"Data Source=" + sPath + ";New=False;Version=3";
             String selectCommand = "Select * from LogTransaction";
-            selectTable(ConnectionString, selectCommand);
+            selectTableAll(ConnectionString, selectCommand);
             dataGridView1.Columns[4].HeaderText = "Agent FIO";
             dataGridView1.Columns[5].HeaderText = "Client FIO";
             dataGridView1.Columns[6].HeaderText = "Contract №";
@@ -120,7 +120,7 @@ namespace TiPEIS
         {
             string ConnectionString = @"Data Source=" + sPath + ";New=False;Version=3";
             String selectCommand = "Select * from LogTransaction";
-            selectTable(ConnectionString, selectCommand);
+            selectTableAll(ConnectionString, selectCommand);
         }
 
         private void F_Create_Click(object sender, EventArgs e)
@@ -174,8 +174,19 @@ namespace TiPEIS
             string ToDate = F_To.Value.Date.ToString("yyyy.MM.dd");
 
             string ConnectionString = @"Data Source=" + sPath + ";New=False;Version=3";
-            String selectCommand = "Select * from LogTransaction WHERE Date BETWEEN " + FromDate + " AND " + ToDate;
-            selectTable(ConnectionString, selectCommand);
+            String selectCommand = "SELECT T.Id, T.KindTransaction, T.Date, T.Summa, A.FIO, C.FIO, T.ContractId FROM [LogTransaction] T left outer join Agent A ON T.AgentId = A.Id left outer join Client C ON T.ClientId= C.Id WHERE T.Date BETWEEN '" + FromDate + "' AND '" + ToDate + "'";
+            selectTableDate(ConnectionString, selectCommand);
+        }
+
+        public void selectTableDate(string ConnectionString, String selectCommand)
+        {
+            SQLiteConnection connect = new SQLiteConnection(ConnectionString);
+            connect.Open();
+            SQLiteDataAdapter sda = new SQLiteDataAdapter(selectCommand, connect);
+            DataTable DATA = new DataTable();
+            sda.Fill(DATA);
+            dataGridView1.DataSource = DATA;
+            connect.Close();
         }
     }
 }
