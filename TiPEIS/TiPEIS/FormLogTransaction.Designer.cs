@@ -79,7 +79,7 @@
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowTemplate.Height = 28;
-            this.dataGridView1.Size = new System.Drawing.Size(1616, 502);
+            this.dataGridView1.Size = new System.Drawing.Size(1134, 502);
             this.dataGridView1.TabIndex = 4;
             this.dataGridView1.RowHeaderMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_RowHeaderMouseDoubleClick);
             // 
@@ -129,7 +129,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1640, 606);
+            this.AutoSize = true;
+            this.ClientSize = new System.Drawing.Size(1176, 606);
             this.Controls.Add(this.F_Show);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -140,7 +141,7 @@
             this.Controls.Add(this.F_Create);
             this.Controls.Add(this.dataGridView1);
             this.Name = "FormLogTransaction";
-            this.Text = "FormLogTransaction";
+            this.Text = "LogTransaction";
             this.Load += new System.EventHandler(this.FormLogTransaction_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);

@@ -51,6 +51,7 @@
             // 
             // F_KindTrans
             // 
+            this.F_KindTrans.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.F_KindTrans.FormattingEnabled = true;
             this.F_KindTrans.Location = new System.Drawing.Point(251, 55);
             this.F_KindTrans.Name = "F_KindTrans";
@@ -102,7 +103,7 @@
             // 
             // F_Save
             // 
-            this.F_Save.Location = new System.Drawing.Point(848, 348);
+            this.F_Save.Location = new System.Drawing.Point(1151, 75);
             this.F_Save.Name = "F_Save";
             this.F_Save.Size = new System.Drawing.Size(92, 35);
             this.F_Save.TabIndex = 6;
@@ -112,7 +113,7 @@
             // 
             // F_Cancel
             // 
-            this.F_Cancel.Location = new System.Drawing.Point(963, 348);
+            this.F_Cancel.Location = new System.Drawing.Point(1266, 75);
             this.F_Cancel.Name = "F_Cancel";
             this.F_Cancel.Size = new System.Drawing.Size(92, 35);
             this.F_Cancel.TabIndex = 7;
@@ -149,14 +150,17 @@
             // 
             // F_Contr
             // 
+            this.F_Contr.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.F_Contr.FormattingEnabled = true;
             this.F_Contr.Location = new System.Drawing.Point(829, 42);
             this.F_Contr.Name = "F_Contr";
             this.F_Contr.Size = new System.Drawing.Size(186, 28);
             this.F_Contr.TabIndex = 11;
+            this.F_Contr.SelectedValueChanged += new System.EventHandler(this.F_Contr_SelectedValueChanged);
             // 
             // F_Agent
             // 
+            this.F_Agent.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.F_Agent.FormattingEnabled = true;
             this.F_Agent.Location = new System.Drawing.Point(829, 119);
             this.F_Agent.Name = "F_Agent";
@@ -165,6 +169,7 @@
             // 
             // F_Client
             // 
+            this.F_Client.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.F_Client.FormattingEnabled = true;
             this.F_Client.Location = new System.Drawing.Point(829, 193);
             this.F_Client.Name = "F_Client";
@@ -204,18 +209,19 @@
             this.F_Wirs.AllowUserToAddRows = false;
             this.F_Wirs.AllowUserToDeleteRows = false;
             this.F_Wirs.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.F_Wirs.Location = new System.Drawing.Point(12, 389);
+            this.F_Wirs.Location = new System.Drawing.Point(12, 339);
             this.F_Wirs.Name = "F_Wirs";
             this.F_Wirs.ReadOnly = true;
             this.F_Wirs.RowTemplate.Height = 28;
-            this.F_Wirs.Size = new System.Drawing.Size(1043, 134);
+            this.F_Wirs.Size = new System.Drawing.Size(1497, 184);
             this.F_Wirs.TabIndex = 17;
             // 
             // FormUpdTrans
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1067, 535);
+            this.AutoSize = true;
+            this.ClientSize = new System.Drawing.Size(1521, 535);
             this.Controls.Add(this.F_Wirs);
             this.Controls.Add(this.F_Calc);
             this.Controls.Add(this.F_term);
@@ -235,7 +241,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.F_KindTrans);
             this.Name = "FormUpdTrans";
-            this.Text = "FormUpdTrans";
+            this.Text = "UpdTransaction";
             this.Load += new System.EventHandler(this.FormUpdTrans_Load);
             ((System.ComponentModel.ISupportInitialize)(this.F_Wirs)).EndInit();
             this.ResumeLayout(false);

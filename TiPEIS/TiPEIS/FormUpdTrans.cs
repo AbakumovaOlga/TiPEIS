@@ -23,7 +23,6 @@ namespace TiPEIS
         //агент, клиент. договор
 
         private int Id;
-        private string[] kinds = new string[] { "Заключение договора - 0", "Перечисление суммы займа - 1", "Закрытие договора - 2", "Возврат займа - 3" };
 
         int idDoc;
         int idAgent;
@@ -64,14 +63,26 @@ namespace TiPEIS
         {
             try
             {
-                object kind = selectValue(ConnectionString, "SELECT KindTransaction FROM LogTransaction WHERE Id=" + Id + ";");
-                F_KindTrans.SelectedIndex = SearchIndexKind(kind.ToString());
+                object doc = selectValue(ConnectionString, "SELECT ContractId FROM LogTransaction WHERE Id=" + Id + ";");
+                F_Contr.SelectedValue = doc;
+                idDoc = Convert.ToInt32(doc);
             }
             catch { }
+
+            try
+            {
+                object kindObj = selectValue(ConnectionString, "SELECT KindTransaction FROM LogTransaction WHERE Id=" + Id + ";");
+                F_KindTrans.SelectedValue = kindObj;
+                kind = Convert.ToInt32(kindObj);
+            }
+            
+            catch { }
+            F_KindTrans.Enabled = false;
             try
             {
                 object date = selectValue(ConnectionString, "SELECT Date FROM LogTransaction WHERE Id=" + Id + ";");
                 F_Date.Value = Convert.ToDateTime(date.ToString());
+                Date = date.ToString();
             }
             catch { }
             try
@@ -84,43 +95,170 @@ namespace TiPEIS
             {
                 object agent = selectValue(ConnectionString, "SELECT AgentId FROM LogTransaction WHERE Id=" + Id + ";");
                 F_Agent.SelectedValue = agent;
+                idAgent = Convert.ToInt32(agent);
             }
             catch { }
             try
             {
                 object client = selectValue(ConnectionString, "SELECT ClientId FROM LogTransaction WHERE Id=" + Id + ";");
                 F_Client.SelectedValue = client;
+                idClient = Convert.ToInt32(client);
             }
             catch { }
 
-            try
-            {
-                object doc = selectValue(ConnectionString, "SELECT ContractId FROM LogTransaction WHERE Id=" + Id + ";");
-                F_Contr.SelectedValue = doc;
-            }
-            catch { }
+            F_Contr.Enabled = false;
 
             try
             {
-                String selectCommand = "select W.Id, W.Summa, W.Date, W.content,  P1.NameAcc as Deb,  A1.FIO as Agent_FIO,  C1.FIO as Client_FIO, D1.Id as Doc_ID_Deb,  P2.NameAcc as Cred,  A2.FIO as Agent_FIO,  C2.FIO as Client_FIO, D2.Id as Doc_ID_Cred from LogWiring W left outer join ChartAccounts P1 on(W.Deb = P1.NumberAcc) left outer join ChartAccounts P2 on(W.Cred = P2.NumberAcc) left outer join Agent A1 on(W.subkontoDeb1 = A1.Id) left outer join Agent A2 on(W.subkontoCred1 = A2.Id) left outer join Client C1 on(W.subkontoDeb2 = C1.Id) left outer join Client C2 on(W.subkontoCred2 = C2.Id) left outer join Contract D1 on(W.subkontoDeb2 = D1.Id) left outer join Contract D2 on(W.subkontoCred2 = D2.Id) where W.LogTrId="+Id;
+                String selectCommand = "select W.Id, W.Summa, W.Date, W.content,  P1.NameAcc as Deb,  A1.FIO as Agent_FIO,  C1.FIO as Client_FIO, D1.Id as Doc_ID_Deb,  P2.NameAcc as Cred,  A2.FIO as Agent_FIO,  C2.FIO as Client_FIO, D2.Id as Doc_ID_Cred from LogWiring W left outer join ChartAccounts P1 on(W.Deb = P1.NumberAcc) left outer join ChartAccounts P2 on(W.Cred = P2.NumberAcc) left outer join Agent A1 on(W.subkontoDeb1 = A1.Id) left outer join Agent A2 on(W.subkontoCred1 = A2.Id) left outer join Client C1 on(W.subkontoDeb2 = C1.Id) left outer join Client C2 on(W.subkontoCred2 = C2.Id) left outer join Contract D1 on(W.subkontoDeb3 = D1.Id) left outer join Contract D2 on(W.subkontoCred3 = D2.Id) where W.LogTrId=" + Id;
                 selectTable(ConnectionString, selectCommand);
             }
             catch { }
 
-           
-        } 
+            SetupOld();
+           // Setup();
 
-        private int SearchIndexKind(string v)
+
+        }
+
+        private void SetupOld()
         {
-            for (int i = 0; i < kinds.Length; i++)
+            object doc = selectValue(ConnectionString, "SELECT ContractId FROM LogTransaction WHERE Id=" + Id + ";");
+            idDoc = Convert.ToInt32(doc);
+            object statusDocObj = selectValue(ConnectionString, "SELECT MAX(KindTransaction) FROM LogTransaction WHERE ContractId=" + idDoc + ";");
+            if (statusDocObj.ToString() == "")
             {
-                if (kinds[i] == v)
+                F_Client.Enabled = true;
+                F_Agent.Enabled = true;
+            }
+            else
+            {
+                int statusDoc = Convert.ToInt32(statusDocObj.ToString());
+                
+                if (statusDoc == 1) //перечисление
                 {
-                    return i;
+                    F_Client.Enabled = true;
+                    F_Agent.Enabled = true;
+                }
+                if (statusDoc == 2) //закрытие
+                {
+                    F_Client.Enabled = false;
+                    F_Agent.Enabled = false;
+                }
+                if (statusDoc == 3) //возврат
+                {
+                    F_Client.Enabled = false;
+                    F_Agent.Enabled = false;
                 }
             }
-            return -1;
         }
+
+        private void Setup()
+        {
+            if (Id != 0) return;
+            /*зная idDoc пройтись по всему журналу проводок
+            найти его статус 
+
+            
+
+             ПЕРЕЧИСЛЕНИЕ
+             ЗАКРЫТИЕ
+             ВОЗВРАТ
+             */
+            GetInfFromForm();
+            int r = idDoc;
+            object statusDocObj = selectValue(ConnectionString, "SELECT MAX(KindTransaction) FROM LogTransaction WHERE ContractId=" + idDoc + ";");
+            if (statusDocObj.ToString() == "")
+            {
+                String selectKinds = "SELECT Id, Name FROM KindTransaction where Id<2";
+                selectCombo(ConnectionString, selectKinds, F_KindTrans, "Name", "Id");
+               // F_KindTrans.SelectedValue = kind;
+
+                F_Client.Enabled = true;
+                F_Agent.Enabled = true;
+            }
+            else
+            {
+                int statusDoc = Convert.ToInt32(statusDocObj.ToString());
+               //перечисление
+                if (statusDoc == 1)
+                {
+                    String selectKinds = "SELECT Id, Name FROM KindTransaction where Id=0 or Id=2";
+                    selectCombo(ConnectionString, selectKinds, F_KindTrans, "Name", "Id");
+                    //F_KindTrans.SelectedValue = kind;
+                    object ki = selectValue(ConnectionString, "SELECT KindTransaction FROM LogTransaction WHERE ContractId=" + idDoc + ";");
+                    selectCombo(ConnectionString, selectKinds, F_KindTrans, "Name", "Id");
+                   // F_KindTrans.SelectedValue = ki;
+                    try
+                    {
+                        object agent = selectValue(ConnectionString, "SELECT AgentId FROM LogTransaction WHERE ContractId=" + idDoc + ";");
+                        F_Agent.SelectedValue = agent;
+                        idAgent = Convert.ToInt32(agent);
+                    }
+                    catch { }
+                    try
+                    {
+                        object client = selectValue(ConnectionString, "SELECT ClientId FROM LogTransaction WHERE ContractId=" + idDoc + ";");
+                        F_Client.SelectedValue = client;
+                        idClient = Convert.ToInt32(client);
+                    }
+                    catch { }
+                    F_Client.Enabled = false;
+                    F_Agent.Enabled = false;
+                }
+                if (statusDoc == 2)
+                {
+                    String selectKinds = "SELECT Id, Name FROM KindTransaction where Id=0 or Id=3";
+                    selectCombo(ConnectionString, selectKinds, F_KindTrans, "Name", "Id");
+                   // F_KindTrans.SelectedValue = kind;
+                    object ki = selectValue(ConnectionString, "SELECT KindTransaction FROM LogTransaction WHERE ContractId=" + idDoc + ";");
+                    selectCombo(ConnectionString, selectKinds, F_KindTrans, "Name", "Id");
+                  //  F_KindTrans.SelectedValue = ki;
+                    try
+                    {
+                        object agent = selectValue(ConnectionString, "SELECT AgentId FROM LogTransaction WHERE ContractId=" + idDoc + ";");
+                        F_Agent.SelectedValue = agent;
+                        idAgent = Convert.ToInt32(agent);
+                    }
+                    catch { }
+                    try
+                    {
+                        object client = selectValue(ConnectionString, "SELECT ClientId FROM LogTransaction WHERE ContractId=" + idDoc + ";");
+                        F_Client.SelectedValue = client;
+                        idClient = Convert.ToInt32(client);
+                    }
+                    catch { }
+                    F_Client.Enabled = false;
+                    F_Agent.Enabled = false;
+                }
+                if (statusDoc == 3)
+                {
+                    String selectKinds = "SELECT Id, Name FROM KindTransaction where Id=0";
+                    object ki = selectValue(ConnectionString, "SELECT KindTransaction FROM LogTransaction WHERE ContractId=" + idDoc + ";");
+                    selectCombo(ConnectionString, selectKinds, F_KindTrans, "Name", "Id");
+                    //F_KindTrans.SelectedValue = ki;
+                    try
+                    {
+                        object agent = selectValue(ConnectionString, "SELECT AgentId FROM LogTransaction WHERE ContractId=" + idDoc + ";");
+                        F_Agent.SelectedValue = agent;
+                        idAgent = Convert.ToInt32(agent);
+                    }
+                    catch { }
+                    try
+                    {
+                        object client = selectValue(ConnectionString, "SELECT ClientId FROM LogTransaction WHERE ContractId=" + idDoc + ";");
+                        F_Client.SelectedValue = client;
+                        idClient = Convert.ToInt32(client);
+                    }
+                    catch { }
+                    F_Client.Enabled = false;
+                    F_Agent.Enabled = false;
+                }
+            }
+
+        }
+
+
 
         private void ExecuteQuery(string txtQuery)
         {
@@ -203,12 +341,13 @@ namespace TiPEIS
             String selectContracts = "SELECT Id FROM Contract";
             selectCombo(ConnectionString, selectContracts, F_Contr, "Id", "Id");
 
+            String selectKinds = "SELECT Id, Name FROM KindTransaction";
+            selectCombo(ConnectionString, selectKinds, F_KindTrans, "Name", "Id");
+
             F_KindTrans.SelectedIndex = -1;
             F_Agent.SelectedIndex = -1;
             F_Client.SelectedIndex = -1;
             F_Contr.SelectedIndex = -1;
-            
-            F_KindTrans.DataSource = kinds;
 
             if (Id != 0)
             {
@@ -218,22 +357,9 @@ namespace TiPEIS
 
         private void F_Save_Click(object sender, EventArgs e)
         {
-
-            if (!Check())
-            {
-                MessageBox.Show("Заполните все поля!");
-                return;
-            }
-
-            idDoc = Convert.ToInt32(F_Contr.SelectedValue.ToString());
-
-            idAgent = Convert.ToInt32(F_Agent.SelectedValue.ToString());
-
-            idClient = Convert.ToInt32(F_Client.SelectedValue.ToString());
-
             Date = F_Date.Value.Date.ToString("yyyy.MM.dd");
 
-            kind = F_KindTrans.SelectedIndex;
+            kind = Convert.ToInt32(F_KindTrans.SelectedValue.ToString());
 
             switch (kind)
             {
@@ -241,32 +367,79 @@ namespace TiPEIS
                     CreateDoc(Date);
                     break;
                 case 1:
+                    if (!Check())
+                    {
+                        MessageBox.Show("Заполните все поля!");
+                        return;
+                    }
+                    GetInfFromForm();
+
                     PayDoc(idDoc, idAgent, idClient, Date, kind);
                     break;
                 case 2:
+                    if (!Check())
+                    {
+                        MessageBox.Show("Заполните все поля!");
+                        return;
+                    }
+                    GetInfFromForm();
                     CloseDoc(idDoc, idAgent, idClient, Date, kind);
                     break;
                 case 3:
+                    if (!Check())
+                    {
+                        MessageBox.Show("Заполните все поля!");
+                        return;
+                    }
+                    GetInfFromForm();
                     RetDoc(idDoc, idAgent, idClient, Date, kind);
                     break;
             }
 
             try
             {
-                String selectCommand = "select W.Id, W.Summa, W.Date, W.content,  P1.NameAcc as Deb,  A1.FIO as Agent_FIO_Deb,  C1.FIO as Client_FIO_Deb, D1.Id as Doc_ID_Deb,  P2.NameAcc as Cred,  A2.FIO as Agent_FIO_Cred,  C2.FIO as Client_FIO_Cred, D2.Id as Doc_ID_Cred from LogWiring W left outer join ChartAccounts P1 on(W.Deb = P1.NumberAcc) left outer join ChartAccounts P2 on(W.Cred = P2.NumberAcc) left outer join Agent A1 on(W.subkontoDeb1 = A1.Id) left outer join Agent A2 on(W.subkontoCred1 = A2.Id) left outer join Client C1 on(W.subkontoDeb2 = C1.Id) left outer join Client C2 on(W.subkontoCred2 = C2.Id) left outer join Contract D1 on(W.subkontoDeb2 = D1.Id) left outer join Contract D2 on(W.subkontoCred2 = D2.Id) where W.LogTrId=" + Id;
+                String selectCommand = "select W.Id, W.Summa, W.Date, W.content,  P1.NameAcc as Deb,  A1.FIO as Agent_FIO_Deb,  C1.FIO as Client_FIO_Deb, D1.Id as Doc_ID_Deb,  P2.NameAcc as Cred,  A2.FIO as Agent_FIO_Cred,  C2.FIO as Client_FIO_Cred, D2.Id as Doc_ID_Cred from LogWiring W left outer join ChartAccounts P1 on(W.Deb = P1.NumberAcc) left outer join ChartAccounts P2 on(W.Cred = P2.NumberAcc) left outer join Agent A1 on(W.subkontoDeb1 = A1.Id) left outer join Agent A2 on(W.subkontoCred1 = A2.Id) left outer join Client C1 on(W.subkontoDeb2 = C1.Id) left outer join Client C2 on(W.subkontoCred2 = C2.Id) left outer join Contract D1 on(W.subkontoDeb3 = D1.Id) left outer join Contract D2 on(W.subkontoCred3 = D2.Id) where W.LogTrId=" + Id;
                 selectTable(ConnectionString, selectCommand);
             }
             catch { }
         }
 
-        private bool Check()
+        private void GetInfFromForm() //получить значения из комбо-боксов 
+        {
+            try
+            {
+                idDoc = Convert.ToInt32(F_Contr.SelectedValue.ToString());
+            }
+            catch { idDoc = 0; }
+            try
+            {
+                idAgent = Convert.ToInt32(F_Agent.SelectedValue.ToString());
+            }
+            catch { idAgent = 0; }
+            try
+            {
+                idClient = Convert.ToInt32(F_Client.SelectedValue.ToString());
+            }
+            catch { idClient = 0; }
+
+            Date = F_Date.Value.Date.ToString("yyyy.MM.dd");
+            try
+            {
+                kind = Convert.ToInt32(F_KindTrans.SelectedValue.ToString());
+            }
+            catch { }
+        }
+
+        private bool Check() //все комбо-боксы выбраны 
         {
             if (F_Contr.SelectedValue == null) return false;
             if (F_Agent.SelectedValue == null) return false;
             if (F_Client.SelectedValue == null) return false;
+            if (F_KindTrans.SelectedValue == null) return false;
 
             return true;
-        } //все комбо-боксы выбраны
+
+        }
 
         private void RetDoc(int idDoc, int idAgent, int idClient, string finishDate, int kind)
         {
@@ -276,11 +449,20 @@ namespace TiPEIS
             процента по договору.
             51-58*/
 
+            startDate = selectValue(ConnectionString, "SELECT startDate FROM Contract WHERE Id=" + idDoc + ";").ToString();
+            if (Convert.ToDateTime(startDate) > Convert.ToDateTime(Date))
+            {
+                MessageBox.Show("Проверьте дату");
+                return;
+            }
+
             //расчет суммы+проценты
             object summa = selectValue(ConnectionString, "SELECT summa FROM Contract WHERE Id=" + idDoc + ";");
-            sumDoc = CalcSum() + Convert.ToDouble(summa);
+            sumDoc = CalcProc() + Convert.ToDouble(summa);
             MessageBox.Show("Итоговая сумма " + sumDoc);
-            
+
+
+
             if (Id == 0) //новая операция
             {
                 String selectCommandTrans = "select MAX(Id) from LogTransaction";
@@ -290,7 +472,7 @@ namespace TiPEIS
 
                 //добавить запись в операции
                 string txtSQLQueryTN = "insert into LogTransaction (Id, KindTransaction, Date, Summa, AgentId, ClientId, ContractId) values (" +
-                    Id + ", '" + kinds[kind] + "', '" + finishDate + "', " + sumDoc.ToString().Replace(",", ".") + ", " + idAgent + ", " + idClient + ", " + idDoc + ")";
+                    Id + ", " + kind + ", '" + finishDate + "', " + sumDoc.ToString().Replace(",", ".") + ", " + idAgent + ", " + idClient + ", " + idDoc + ")";
                 ExecuteQuery(txtSQLQueryTN);
                 MessageBox.Show("Добавлена новая операция");
 
@@ -306,7 +488,7 @@ namespace TiPEIS
             else //Изменение
             {
                 String selectCommandTU = "update LogTransaction set " +
-                  "KindTransaction='" + kinds[kind] + "'" +
+                  "KindTransaction=" + kind + "" +
                     ", Date='" + finishDate + "'" +
                     ", Summa=" + sumDoc.ToString().Replace(",", ".") +
                     ", AgentId=" + idAgent +
@@ -323,7 +505,10 @@ namespace TiPEIS
                     ", Cred='" + 58 + "'" +
                     ", subkontoCred1=" + idAgent +
                     ", subkontoCred2=" + idClient +
-                    ", subkontoCred3=" + idDoc
+                    ", subkontoCred3=" + idDoc +
+                    ", subkontoDeb1=" + "NULL" +
+                    ", subkontoDeb2=" + "NULL" +
+                    ", subkontoDeb3=" + "NULL"
                     + " where LogTrId = " + Id;
                 changeValue(ConnectionString, selectCommandWU);
                 MessageBox.Show("Проводка изменена");
@@ -341,9 +526,16 @@ namespace TiPEIS
             СуммаПроводки=Договор.Процент1*Договор.СуммаДоговора, иначе
             СуммаПроводки=Договор.Процент2*Договор.СуммаДоговора.
             58-84 (начисленные проценты)*/
-            
+
+            startDate = selectValue(ConnectionString, "SELECT startDate FROM Contract WHERE Id=" + idDoc + ";").ToString();
+            if (Convert.ToDateTime(startDate) > Convert.ToDateTime(Date))
+            {
+                MessageBox.Show("Проверьте дату");
+                return;
+            }
+
             //расчет суммы
-            sumDoc = CalcSum();
+            sumDoc = CalcProc();
             MessageBox.Show("Итоговая сумма " + sumDoc);
 
             if (Id == 0)
@@ -355,7 +547,7 @@ namespace TiPEIS
 
                 //добавить запись в операции
                 string txtSQLQueryTN = "insert into LogTransaction (Id, KindTransaction, Date, Summa, AgentId, ClientId, ContractId) values (" +
-                        Id + ", '" + kinds[kind] + "', '" + finishDate + "', " + sumDoc.ToString().Replace(",", ".") + ", " + idAgent + ", " + idClient + ", " + idDoc + ")";
+                        Id + ", " + kind + ", '" + finishDate + "', " + sumDoc.ToString().Replace(",", ".") + ", " + idAgent + ", " + idClient + ", " + idDoc + ")";
                 ExecuteQuery(txtSQLQueryTN);
                 MessageBox.Show("Добавлена новая операция");
 
@@ -372,7 +564,7 @@ namespace TiPEIS
             else
             {
                 String selectCommandTU = "update LogTransaction set " +
-                  "KindTransaction='" + kinds[kind] + "'" +
+                  "KindTransaction=" + kind + "" +
                     ", Date='" + finishDate + "'" +
                     ", Summa=" + sumDoc.ToString().Replace(",", ".") +
                     ", AgentId=" + idAgent +
@@ -389,7 +581,10 @@ namespace TiPEIS
                     ", Cred='" + 84 + "'" +
                     ", subkontoDeb1=" + idAgent +
                     ", subkontoDeb2=" + idClient +
-                    ", subkontoDeb3=" + idDoc
+                    ", subkontoDeb3=" + idDoc +
+                    ", subkontoCred1=" + "NULL" +
+                    ", subkontoCred2=" + "NULL" +
+                    ", subkontoCred3=" + "NULL"
                     + " where LogTrId = " + Id;
                 changeValue(ConnectionString, selectCommandWU);
                 MessageBox.Show("Проводка изменена");
@@ -410,7 +605,12 @@ namespace TiPEIS
               автоматически после ввода даты операции и выбора договора займа.
 
               58-51(сумма договора)*/
-
+            startDate = selectValue(ConnectionString, "SELECT startDate FROM Contract WHERE Id=" + idDoc + ";").ToString();
+            if (Convert.ToDateTime(startDate) > Convert.ToDateTime(Date))
+            {
+                MessageBox.Show("Проверьте дату");
+                return;
+            }
 
 
             //расчет суммы
@@ -426,7 +626,7 @@ namespace TiPEIS
 
                 //добавить запись в операции
                 string txtSQLQueryT = "insert into LogTransaction (Id, KindTransaction, Date, Summa, AgentId, ClientId, ContractId) values (" +
-                        Id + ", '" + kinds[kind] + "', '" + finishDate + "', " + summa.ToString().Replace(",", ".") + ", " + idAgent + ", " + idClient + ", " + idDoc + ")";
+                        Id + ", '" + kind + "', '" + finishDate + "', " + summa.ToString().Replace(",", ".") + ", " + idAgent + ", " + idClient + ", " + idDoc + ")";
                 ExecuteQuery(txtSQLQueryT);
                 MessageBox.Show("Добавлена новая операция");
 
@@ -442,7 +642,7 @@ namespace TiPEIS
             else
             {
                 String selectCommandTU = "update LogTransaction set " +
-                  "KindTransaction='" + kinds[kind] + "'" +
+                  "KindTransaction='" + kind + "'" +
                     ", Date='" + finishDate + "'" +
                     ", Summa=" + summa.ToString().Replace(",", ".") +
                     ", AgentId=" + idAgent +
@@ -459,7 +659,10 @@ namespace TiPEIS
                     ", Cred='" + 84 + "'" +
                     ", subkontoDeb1=" + idAgent +
                     ", subkontoDeb2=" + idClient +
-                    ", subkontoDeb3=" + idDoc
+                    ", subkontoDeb3=" + idDoc +
+                    ", subkontoCred1=" + "NULL" +
+                    ", subkontoCred2=" + "NULL" +
+                    ", subkontoCred3=" + "NULL"
                     + " where LogTrId = " + Id;
                 changeValue(ConnectionString, selectCommandWU);
                 MessageBox.Show("Проводка изменена");
@@ -537,7 +740,7 @@ namespace TiPEIS
             }
             else
             {
-                MessageBox.Show("Несоответсвие формату Срок по договору");
+                MessageBox.Show("Несоответсвие формату Срок");
                 return;
             }
 
@@ -561,7 +764,7 @@ namespace TiPEIS
 
         private void F_KindTrans_SelectedIndexChanged(object sender, EventArgs e)
         {
-            kind = F_KindTrans.SelectedIndex;
+            /*kind = F_KindTrans.SelectedIndex;
             if (kind == 0)
             {
                 F_term.Visible = true;
@@ -573,7 +776,23 @@ namespace TiPEIS
                 F_term.Visible = false;
                 label7.Visible = false;
                 F_summa.ReadOnly = true;
+
             }
+
+            if (kind == 1)
+            {
+                F_Agent.Enabled = true;
+                F_Client.Enabled = true;
+
+            }
+            else
+            {
+                F_Agent.Enabled = false;
+                F_Client.Enabled = false;
+            }*/
+
+
+            //запретить менять комб-бокс
         }
 
         private void F_Calc_Click(object sender, EventArgs e)
@@ -582,42 +801,15 @@ namespace TiPEIS
             {
                 return;
             }
-            idDoc = Convert.ToInt32(F_Contr.SelectedValue.ToString());
-            string finishDate = F_Date.Value.Date.ToString("yyyy.MM.dd");
+            GetInfFromForm();
+
+
             startDate = selectValue(ConnectionString, "SELECT startDate FROM Contract WHERE Id=" + idDoc + ";").ToString();
             double summa = Convert.ToDouble(selectValue(ConnectionString, "SELECT summa FROM Contract WHERE Id=" + idDoc + ";"));
-            kind = F_KindTrans.SelectedIndex;
-            // idAgent = Convert.ToInt32(F_Agent.SelectedValue.ToString());
-            //idClient = Convert.ToInt32(F_Client.SelectedValue.ToString());
+            kind = Convert.ToInt32(F_KindTrans.SelectedValue.ToString());
 
 
-
-
-            /*   term = Convert.ToInt32(selectValue(ConnectionString, "SELECT term FROM Contract WHERE Id=" + idDoc + ";").ToString());
-               idDoc = Convert.ToInt32(F_Contr.SelectedValue.ToString());
-               sumDoc = Convert.ToDouble(selectValue(ConnectionString, "SELECT summa FROM Contract WHERE Id=" + idDoc + ";").ToString());
-
-               percent1 = Convert.ToDouble((selectValue(ConnectionString, "SELECT percent1 FROM Contract WHERE Id=" + idDoc + ";")).ToString().Replace(".", ","));
-               percent2 = Convert.ToDouble((selectValue(ConnectionString, "SELECT percent2 FROM Contract WHERE Id=" + idDoc + ";")).ToString().Replace(".", ","));
-
-               if (Convert.ToDateTime(startDate) > Convert.ToDateTime(finishDate))
-               {
-                   MessageBox.Show("Проверьте дату");
-                   return;
-               }
-
-               if ((Convert.ToDateTime(finishDate) - Convert.ToDateTime(startDate)).TotalDays > term) //финиш-старт>срока -> срок истек
-               {
-                   if (percent1 != 0)
-                       sumDoc = Convert.ToDouble(sumDoc) * percent1;
-               }
-               else
-               {
-                   if (percent2 != 0)
-                       sumDoc = Convert.ToDouble(sumDoc) * percent2;
-               }*/
-
-            if (Convert.ToDateTime(startDate) > Convert.ToDateTime(finishDate))
+            if (Convert.ToDateTime(startDate) > Convert.ToDateTime(Date))
             {
                 MessageBox.Show("Проверьте дату");
                 return;
@@ -632,41 +824,48 @@ namespace TiPEIS
                     F_summa.Text = summa.ToString();
                     break;
                 case 2:
-                    F_summa.Text = CalcSum().ToString();
+                    F_summa.Text = CalcProc().ToString();
                     break;
                 case 3:
-                    F_summa.Text = (CalcSum() + summa).ToString();
+                    F_summa.Text = (CalcProc() + summa).ToString();
                     break;
             }
         }
 
-        private double CalcSum()
+        private double CalcProc() //
         {
-            string finishDate = F_Date.Value.Date.ToString("yyyy.MM.dd");
-            idDoc = Convert.ToInt32(F_Contr.SelectedValue.ToString());
+            double res = 0;
+            // string finishDate = F_Date.Value.Date.ToString("yyyy.MM.dd");
+            // idDoc = Convert.ToInt32(F_Contr.SelectedValue.ToString());
             sumDoc = Convert.ToDouble(selectValue(ConnectionString, "SELECT summa FROM Contract WHERE Id=" + idDoc + ";").ToString());
-
-
             startDate = selectValue(ConnectionString, "SELECT startDate FROM Contract WHERE Id=" + idDoc + ";").ToString();
-
             term = Convert.ToInt32(selectValue(ConnectionString, "SELECT term FROM Contract WHERE Id=" + idDoc + ";").ToString());
 
             percent1 = Convert.ToDouble((selectValue(ConnectionString, "SELECT percent1 FROM Contract WHERE Id=" + idDoc + ";")).ToString().Replace(".", ","));
             percent2 = Convert.ToDouble((selectValue(ConnectionString, "SELECT percent2 FROM Contract WHERE Id=" + idDoc + ";")).ToString().Replace(".", ","));
 
-
-
-            if ((Convert.ToDateTime(finishDate) - Convert.ToDateTime(startDate)).TotalDays > term) //финиш-старт>срока -> срок истек
+            if ((Convert.ToDateTime(Date) - Convert.ToDateTime(startDate)).TotalDays > term) //финиш-старт>срока -> срок истек
             {
                 if (percent1 != 0)
-                    sumDoc = Convert.ToDouble(sumDoc) * percent1;
+                    res = Convert.ToDouble(sumDoc) * percent1;
             }
             else
             {
                 if (percent2 != 0)
-                    sumDoc = Convert.ToDouble(sumDoc) * percent2;
+                    res = Convert.ToDouble(sumDoc) * percent2;
             }
-            return sumDoc;
+            return res;
+        }
+
+        private void F_Contr_SelectedValueChanged(object sender, EventArgs e)
+        {
+            if (F_Contr.DataSource == null) return;
+            try
+            {
+                idDoc = Convert.ToInt32(F_Contr.SelectedValue.ToString());
+                Setup();
+            }
+            catch { }
         }
     }
 }

@@ -48,6 +48,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(1440, 454);
             this.Controls.Add(this.dataGridView1);
             this.Name = "FormChartAcc";

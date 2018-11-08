@@ -56,7 +56,7 @@ namespace TiPEIS
             dataGridView1.DataMember = ds.Tables[0].ToString();
             connect.Close();*/
             connect.Open();
-            SQLiteDataAdapter sda = new SQLiteDataAdapter("SELECT T.Id, T.KindTransaction, T.Date, T.Summa, A.FIO, C.FIO, T.ContractId FROM [LogTransaction] T left outer join Agent A ON T.AgentId = A.Id left outer join Client C ON T.ClientId= C.Id ", connect);
+            SQLiteDataAdapter sda = new SQLiteDataAdapter("SELECT T.Id, K.Name, T.Date, T.Summa, A.FIO, C.FIO, T.ContractId FROM [LogTransaction] T left outer join Agent A ON T.AgentId = A.Id left outer join Client C ON T.ClientId= C.Id left outer join KindTransaction K ON T.KindTransaction= K.Id", connect);
             DataTable DATA = new DataTable();
             sda.Fill(DATA);
             dataGridView1.DataSource = DATA;
@@ -172,6 +172,12 @@ namespace TiPEIS
         {
             string FromDate = F_From.Value.Date.ToString("yyyy.MM.dd");
             string ToDate = F_To.Value.Date.ToString("yyyy.MM.dd");
+
+            if (Convert.ToDateTime(FromDate) > Convert.ToDateTime(ToDate))
+            {
+                MessageBox.Show("Проверьте дату");
+                return;
+            }
 
             string ConnectionString = @"Data Source=" + sPath + ";New=False;Version=3";
             String selectCommand = "SELECT T.Id, T.KindTransaction, T.Date, T.Summa, A.FIO, C.FIO, T.ContractId FROM [LogTransaction] T left outer join Agent A ON T.AgentId = A.Id left outer join Client C ON T.ClientId= C.Id WHERE T.Date BETWEEN '" + FromDate + "' AND '" + ToDate + "'";
