@@ -22,6 +22,10 @@ namespace TiPEIS
         //double(10,2) Summa
         //агент, клиент. договор
 
+            //перечисление 
+            //закрытие
+            //возврат
+
         private int Id;
 
         int idDoc;
@@ -156,6 +160,14 @@ namespace TiPEIS
         private void Setup()
         {
             if (Id != 0) return;
+            if (F_Contr.SelectedIndex == -1)
+            {
+                F_KindTrans.Enabled = false;
+            }
+            else
+            {
+                F_KindTrans.Enabled = true;
+            }
             /*зная idDoc пройтись по всему журналу проводок
             найти его статус 
 
@@ -271,7 +283,7 @@ namespace TiPEIS
         }
 
         public object selectValue(string ConnectionString, String selectCommand)
-        {
+        { 
             SQLiteConnection connect = new
             SQLiteConnection(ConnectionString);
             connect.Open();
@@ -313,6 +325,8 @@ namespace TiPEIS
             connect.Close();
         }
 
+
+
         public void changeValue(string ConnectionString, String selectCommand)
         {
             SQLiteConnection connect = new
@@ -349,6 +363,15 @@ namespace TiPEIS
             F_Client.SelectedIndex = -1;
             F_Contr.SelectedIndex = -1;
 
+            if (F_Contr.SelectedIndex == -1)
+            {
+                F_KindTrans.Enabled = false;
+            }
+            else
+            {
+                F_KindTrans.Enabled = true;
+            }
+
             if (Id != 0)
             {
                 LoadDate();
@@ -366,7 +389,7 @@ namespace TiPEIS
                 case 0:
                     CreateDoc(Date);
                     break;
-                case 1:
+                case 1://перечисление
                     if (!Check())
                     {
                         MessageBox.Show("Заполните все поля!");
@@ -376,7 +399,7 @@ namespace TiPEIS
 
                     PayDoc(idDoc, idAgent, idClient, Date, kind);
                     break;
-                case 2:
+                case 2://закрытие
                     if (!Check())
                     {
                         MessageBox.Show("Заполните все поля!");
@@ -385,7 +408,7 @@ namespace TiPEIS
                     GetInfFromForm();
                     CloseDoc(idDoc, idAgent, idClient, Date, kind);
                     break;
-                case 3:
+                case 3://возврат
                     if (!Check())
                     {
                         MessageBox.Show("Заполните все поля!");
@@ -456,6 +479,13 @@ namespace TiPEIS
                 return;
             }
 
+            object datePere = selectValue(ConnectionString, "SELECT MAX(Date) FROM LogWiring WHERE subkontoDeb3=" + idDoc + ";").ToString();
+            if (Convert.ToDateTime(datePere) > Convert.ToDateTime(Date))
+            {
+                MessageBox.Show("Дата возврата раньше даты закрытия. Проверьте дату");
+                return;
+            }
+
             //расчет суммы+проценты
             object summa = selectValue(ConnectionString, "SELECT summa FROM Contract WHERE Id=" + idDoc + ";");
             sumDoc = CalcProc() + Convert.ToDouble(summa);
@@ -487,6 +517,7 @@ namespace TiPEIS
             }
             else //Изменение
             {
+               
                 String selectCommandTU = "update LogTransaction set " +
                   "KindTransaction=" + kind + "" +
                     ", Date='" + finishDate + "'" +
@@ -533,6 +564,12 @@ namespace TiPEIS
                 MessageBox.Show("Проверьте дату");
                 return;
             }
+            string datePere= selectValue(ConnectionString, "SELECT Date FROM LogTransaction WHERE ContractId=" + idDoc + " AND KindTransaction=1").ToString();
+            if (Convert.ToDateTime(datePere) > Convert.ToDateTime(Date))
+            {
+                MessageBox.Show("Дата закрытия раньше даты перечисления. Проверьте дату");
+                return;
+            }
 
             //расчет суммы
             sumDoc = CalcProc();
@@ -562,7 +599,54 @@ namespace TiPEIS
 
             }
             else
-            {
+            {//piyfudtysdfguhjgyufaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa если есть возврат, то меньше него, если нет, то любой
+                //string re = selectValue(ConnectionString, "SELECT (Date) FROM LogWiring WHERE subkontoCred3=" + idDoc + " AND "+"" ).ToString();
+                //string re= selectValue(ConnectionString, "SELECT Date FROM LogWiring WHERE subkontoCred3=" + idDoc + ";").ToString();//был ли возврат
+                //if (re != "")
+                //{
+                //    if (Convert.ToDateTime(re) < Convert.ToDateTime(Date))
+                //    {
+                //        MessageBox.Show("Дата закрытия позже даты возврата. Проверьте дату");
+                //        return;
+                //    }
+                //}
+
+                //должна быть меньше возврата
+                object idDocRed = selectValue(ConnectionString, "select ContractId from LogTransaction where Id=" + Id);
+
+                object vozvr = selectValue(ConnectionString, "select Id from LogTransaction where KindTransaction=3 AND ContractId=" + idDocRed);
+                {
+                    if (vozvr.ToString() != "")
+                    {
+                        object dateClose = selectValue(ConnectionString, "select Date from LogTransaction where Id=" + vozvr);
+
+                        if (Convert.ToDateTime(dateClose) < Convert.ToDateTime(Date))
+                        {
+                            MessageBox.Show("Дата перечисления позже даты закрытия и возврата. Проверьте дату");
+                            return;
+                        }
+                    }
+                }
+
+               /* //должна быть больше перечисления
+                object idDocRed = selectValue(ConnectionString, "select ContractId from LogTransaction where Id=" + Id);
+
+                object zakr = selectValue(ConnectionString, "select Id from LogTransaction where KindTransaction=2 AND ContractId=" + idDocRed);
+                {
+                    if (zakr.ToString() != "")
+                    {
+                        object dateClose = selectValue(ConnectionString, "select Date from LogTransaction where Id=" + zakr);
+
+                        if (Convert.ToDateTime(dateClose) < Convert.ToDateTime(Date))
+                        {
+                            MessageBox.Show("Дата перечисления позже даты закрытия и возврата. Проверьте дату");
+                            return;
+                        }
+                    }
+                }*/
+                
+
+
                 String selectCommandTU = "update LogTransaction set " +
                   "KindTransaction=" + kind + "" +
                     ", Date='" + finishDate + "'" +
@@ -640,7 +724,30 @@ namespace TiPEIS
                 MessageBox.Show("Добавлена новая проводка");
             }
             else
-            {
+            {//должна быть меньше закрытия
+                object idDocRed = selectValue(ConnectionString, "select ContractId from LogTransaction where Id=" + Id);
+
+                object zakr = selectValue(ConnectionString, "select Id from LogTransaction where KindTransaction=2 AND ContractId="+ idDocRed);
+                {
+                    if (zakr.ToString() != "")
+                    {
+                        object dateClose = selectValue(ConnectionString, "select Date from LogTransaction where Id=" + zakr);
+
+                        if (Convert.ToDateTime(dateClose) < Convert.ToDateTime(Date))
+                        {
+                            MessageBox.Show("Дата перечисления позже даты закрытия и возврата. Проверьте дату");
+                            return;
+                        }
+                    }
+                }
+
+
+                //string dateRed = selectValue(ConnectionString, "SELECT MIN(Date) FROM LogWiring WHERE subkontoDeb3=" + idDoc + "AND ").ToString();
+                //if (Convert.ToDateTime(dateRed) < Convert.ToDateTime(Date))
+                //{
+                //    MessageBox.Show("Дата перечисления позже даты закрытия и возврата. Проверьте дату");
+                //    return;
+                //}
                 String selectCommandTU = "update LogTransaction set " +
                   "KindTransaction='" + kind + "'" +
                     ", Date='" + finishDate + "'" +
@@ -866,6 +973,15 @@ namespace TiPEIS
                 Setup();
             }
             catch { }
+
+            if (F_Contr.SelectedIndex == -1)
+            {
+                F_KindTrans.Enabled = false;
+            }
+            else
+            {
+                F_KindTrans.Enabled = true;
+            }
         }
     }
 }

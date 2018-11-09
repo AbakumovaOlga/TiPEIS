@@ -135,10 +135,26 @@ namespace TiPEIS
             {
                 return;
             }
+
+
             // выбрана строка CurrentRow
             int CurrentRow = dataGridView1.SelectedCells[0].RowIndex;
             //получить значение idAgent выбранной строки
             string valueId = dataGridView1[0, CurrentRow].Value.ToString();
+
+            /*string dateNow = selectValue(ConnectionString, "SELECT Date FROM LogTransaction WHERE Id=" + valueId + ";").ToString();
+
+            object idDoc = selectValue(ConnectionString, "select ContractId from LogTransaction where Id=" + valueId);
+            string dateMax = selectValue(ConnectionString, "SELECT MAX(Date) FROM LogWiring WHERE subkontoDeb3=" + idDoc + ";").ToString();
+            */
+            object idDoc = selectValue(ConnectionString, "select ContractId from LogTransaction where Id=" + valueId);
+            object idKind = selectValue(ConnectionString, "select KindTransaction from LogTransaction where Id=" + valueId);
+
+            string res = selectValue(ConnectionString, "SELECT Id FROM LogTransaction WHERE ContractId=" + idDoc + " AND KindTransaction >" + idKind).ToString();
+            if (res != "") {
+                MessageBox.Show("Это не последняя операция");
+                return;
+            }
 
             //убираем завершение договора
             object kind = selectValue(ConnectionString, "select KindTransaction from LogTransaction where Id=" + valueId);

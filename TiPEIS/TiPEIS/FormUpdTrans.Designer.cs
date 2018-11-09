@@ -221,7 +221,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1521, 535);
+            this.ClientSize = new System.Drawing.Size(1521, 543);
             this.Controls.Add(this.F_Wirs);
             this.Controls.Add(this.F_Calc);
             this.Controls.Add(this.F_term);
