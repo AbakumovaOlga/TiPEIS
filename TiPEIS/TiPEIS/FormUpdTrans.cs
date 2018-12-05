@@ -114,7 +114,7 @@ namespace TiPEIS
 
             try
             {
-                String selectCommand = "select W.Id, W.Summa, W.Date, W.content,  P1.NameAcc as Deb,  A1.FIO as Agent_FIO,  C1.FIO as Client_FIO, D1.Id as Doc_ID_Deb,  P2.NameAcc as Cred,  A2.FIO as Agent_FIO,  C2.FIO as Client_FIO, D2.Id as Doc_ID_Cred from LogWiring W left outer join ChartAccounts P1 on(W.Deb = P1.NumberAcc) left outer join ChartAccounts P2 on(W.Cred = P2.NumberAcc) left outer join Agent A1 on(W.subkontoDeb1 = A1.Id) left outer join Agent A2 on(W.subkontoCred1 = A2.Id) left outer join Client C1 on(W.subkontoDeb2 = C1.Id) left outer join Client C2 on(W.subkontoCred2 = C2.Id) left outer join Contract D1 on(W.subkontoDeb3 = D1.Id) left outer join Contract D2 on(W.subkontoCred3 = D2.Id) where W.LogTrId=" + Id;
+                String selectCommand = "select W.Id, W.Summa, W.Date, W.content,  P1.NameAcc as Deb,  A1.FIO as subkontoDed1,  C1.FIO as subkontoDed2, D1.Id as subkontoDed3,  P2.NameAcc as Cred,  A2.FIO as subkontoCred1,  C2.FIO as subkontoCred2, D2.Id as subkontoCred3 from LogWiring W left outer join ChartAccounts P1 on(W.Deb = P1.NumberAcc) left outer join ChartAccounts P2 on(W.Cred = P2.NumberAcc) left outer join Agent A1 on(W.subkontoDeb1 = A1.Id) left outer join Agent A2 on(W.subkontoCred1 = A2.Id) left outer join Client C1 on(W.subkontoDeb2 = C1.Id) left outer join Client C2 on(W.subkontoCred2 = C2.Id) left outer join Contract D1 on(W.subkontoDeb3 = D1.Id) left outer join Contract D2 on(W.subkontoCred3 = D2.Id) where W.LogTrId=" + Id;
                 selectTable(ConnectionString, selectCommand);
             }
             catch { }
@@ -421,7 +421,7 @@ namespace TiPEIS
 
             try
             {
-                String selectCommand = "select W.Id, W.Summa, W.Date, W.content,  P1.NameAcc as Deb,  A1.FIO as Agent_FIO_Deb,  C1.FIO as Client_FIO_Deb, D1.Id as Doc_ID_Deb,  P2.NameAcc as Cred,  A2.FIO as Agent_FIO_Cred,  C2.FIO as Client_FIO_Cred, D2.Id as Doc_ID_Cred from LogWiring W left outer join ChartAccounts P1 on(W.Deb = P1.NumberAcc) left outer join ChartAccounts P2 on(W.Cred = P2.NumberAcc) left outer join Agent A1 on(W.subkontoDeb1 = A1.Id) left outer join Agent A2 on(W.subkontoCred1 = A2.Id) left outer join Client C1 on(W.subkontoDeb2 = C1.Id) left outer join Client C2 on(W.subkontoCred2 = C2.Id) left outer join Contract D1 on(W.subkontoDeb3 = D1.Id) left outer join Contract D2 on(W.subkontoCred3 = D2.Id) where W.LogTrId=" + Id;
+                String selectCommand = "select W.Id, W.Summa, W.Date, W.content,  P1.NameAcc as Deb,  A1.FIO as subkontoDeb1,  C1.FIO as subkontoDeb2, D1.Id as subkontoDeb3,  P2.NameAcc as Cred,  A2.FIO as subkontoCred1,  C2.FIO as subkontoCred2, D2.Id as subkontoCred3 from LogWiring W left outer join ChartAccounts P1 on(W.Deb = P1.NumberAcc) left outer join ChartAccounts P2 on(W.Cred = P2.NumberAcc) left outer join Agent A1 on(W.subkontoDeb1 = A1.Id) left outer join Agent A2 on(W.subkontoCred1 = A2.Id) left outer join Client C1 on(W.subkontoDeb2 = C1.Id) left outer join Client C2 on(W.subkontoCred2 = C2.Id) left outer join Contract D1 on(W.subkontoDeb3 = D1.Id) left outer join Contract D2 on(W.subkontoCred3 = D2.Id) where W.LogTrId=" + Id;
                 selectTable(ConnectionString, selectCommand);
             }
             catch { }

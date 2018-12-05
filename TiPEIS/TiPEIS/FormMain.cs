@@ -52,5 +52,17 @@ namespace TiPEIS
             var form = new FormLogWir();
             form.Show();
         }
+
+        private void суммаВозвратаToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var form = new FormReportV();
+            form.Show();
+        }
+
+        private void процентыToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var form = new FormReportP();
+            form.Show();
+        }
     }
 }

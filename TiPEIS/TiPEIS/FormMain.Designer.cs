@@ -37,6 +37,8 @@
             this.журналПроводокToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.отчетыToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.операцииToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.суммаВозвратаToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.процентыToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -109,9 +111,26 @@
             // 
             // операцииToolStripMenuItem
             // 
+            this.операцииToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.суммаВозвратаToolStripMenuItem,
+            this.процентыToolStripMenuItem});
             this.операцииToolStripMenuItem.Name = "операцииToolStripMenuItem";
             this.операцииToolStripMenuItem.Size = new System.Drawing.Size(84, 29);
             this.операцииToolStripMenuItem.Text = "Отчеты";
+            // 
+            // суммаВозвратаToolStripMenuItem
+            // 
+            this.суммаВозвратаToolStripMenuItem.Name = "суммаВозвратаToolStripMenuItem";
+            this.суммаВозвратаToolStripMenuItem.Size = new System.Drawing.Size(252, 30);
+            this.суммаВозвратаToolStripMenuItem.Text = "Сумма возврата";
+            this.суммаВозвратаToolStripMenuItem.Click += new System.EventHandler(this.суммаВозвратаToolStripMenuItem_Click);
+            // 
+            // процентыToolStripMenuItem
+            // 
+            this.процентыToolStripMenuItem.Name = "процентыToolStripMenuItem";
+            this.процентыToolStripMenuItem.Size = new System.Drawing.Size(252, 30);
+            this.процентыToolStripMenuItem.Text = "Проценты";
+            this.процентыToolStripMenuItem.Click += new System.EventHandler(this.процентыToolStripMenuItem_Click);
             // 
             // FormMain
             // 
@@ -140,6 +159,8 @@
         private System.Windows.Forms.ToolStripMenuItem журналПроводокToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem отчетыToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem операцииToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem суммаВозвратаToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem процентыToolStripMenuItem;
     }
 }
 

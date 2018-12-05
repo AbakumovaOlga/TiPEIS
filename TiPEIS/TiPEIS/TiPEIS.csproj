@@ -111,6 +111,18 @@
     <Compile Include="FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormReportP.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormReportP.Designer.cs">
+      <DependentUpon>FormReportP.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormReportV.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormReportV.Designer.cs">
+      <DependentUpon>FormReportV.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormUpdate.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -148,6 +160,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormReportP.resx">
+      <DependentUpon>FormReportP.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormReportV.resx">
+      <DependentUpon>FormReportV.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormUpdate.resx">
       <DependentUpon>FormUpdate.cs</DependentUpon>

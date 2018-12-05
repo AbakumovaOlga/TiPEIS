@@ -94,7 +94,7 @@ namespace TiPEIS
         {
             string ConnectionString = @"Data Source=" + sPath + ";New=False;Version=3";
             // String selectCommand = "Select * from LogWiring";
-            String selectCommand = "select W.Id, W.Summa, W.Date, W.content,  W.Deb,  A1.FIO as Agent_FIO,  C1.FIO as Client_FIO, D1.Id as Doc_ID_Deb,  W.Cred,  A2.FIO as Agent_FIO,  C2.FIO as Client_FIO, D2.Id as Doc_ID_Cred, W.LogTrId from LogWiring W left outer join Agent A1 on(W.subkontoDeb1 = A1.Id) left outer join Agent A2 on(W.subkontoCred1 = A2.Id) left outer join Client C1 on(W.subkontoDeb2 = C1.Id) left outer join Client C2 on(W.subkontoCred2 = C2.Id) left outer join Contract D1 on(W.subkontoDeb2 = D1.Id) left outer join Contract D2 on(W.subkontoCred2 = D2.Id) ";
+            String selectCommand = "select W.Id, W.Summa, W.Date, W.content,  W.Deb,  A1.FIO as subkontoDeb1,  C1.FIO as subkontoDeb2, D1.Id as subkontoDeb3,  W.Cred,  A2.FIO as subkontoCred1,  C2.FIO as subkontoCred2, D2.Id as subkontoCred3, W.LogTrId from LogWiring W left outer join Agent A1 on(W.subkontoDeb1 = A1.Id) left outer join Agent A2 on(W.subkontoCred1 = A2.Id) left outer join Client C1 on(W.subkontoDeb2 = C1.Id) left outer join Client C2 on(W.subkontoCred2 = C2.Id) left outer join Contract D1 on(W.subkontoDeb2 = D1.Id) left outer join Contract D2 on(W.subkontoCred2 = D2.Id) ";
             selectTable(ConnectionString, selectCommand);
         }
         public void refreshForm(string ConnectionString, String selectCommand)
