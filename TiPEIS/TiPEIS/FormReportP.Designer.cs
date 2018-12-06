@@ -36,6 +36,9 @@
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.F_sum = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.F_Doc = new System.Windows.Forms.Button();
+            this.F_Xls = new System.Windows.Forms.Button();
+            this.F_Pdf = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -90,7 +93,7 @@
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowTemplate.Height = 28;
-            this.dataGridView1.Size = new System.Drawing.Size(1134, 502);
+            this.dataGridView1.Size = new System.Drawing.Size(1134, 394);
             this.dataGridView1.TabIndex = 13;
             // 
             // F_sum
@@ -109,11 +112,44 @@
             this.label3.TabIndex = 21;
             this.label3.Text = "Итого";
             // 
+            // F_Doc
+            // 
+            this.F_Doc.Location = new System.Drawing.Point(12, 464);
+            this.F_Doc.Name = "F_Doc";
+            this.F_Doc.Size = new System.Drawing.Size(98, 35);
+            this.F_Doc.TabIndex = 23;
+            this.F_Doc.Text = "Doc";
+            this.F_Doc.UseVisualStyleBackColor = true;
+            this.F_Doc.Click += new System.EventHandler(this.F_Doc_Click);
+            // 
+            // F_Xls
+            // 
+            this.F_Xls.Location = new System.Drawing.Point(206, 464);
+            this.F_Xls.Name = "F_Xls";
+            this.F_Xls.Size = new System.Drawing.Size(98, 35);
+            this.F_Xls.TabIndex = 24;
+            this.F_Xls.Text = "Xls";
+            this.F_Xls.UseVisualStyleBackColor = true;
+            this.F_Xls.Click += new System.EventHandler(this.F_Xls_Click);
+            // 
+            // F_Pdf
+            // 
+            this.F_Pdf.Location = new System.Drawing.Point(421, 464);
+            this.F_Pdf.Name = "F_Pdf";
+            this.F_Pdf.Size = new System.Drawing.Size(98, 35);
+            this.F_Pdf.TabIndex = 25;
+            this.F_Pdf.Text = "Pdf";
+            this.F_Pdf.UseVisualStyleBackColor = true;
+            this.F_Pdf.Click += new System.EventHandler(this.F_Pdf_Click);
+            // 
             // FormReportP
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1153, 582);
+            this.ClientSize = new System.Drawing.Size(1153, 506);
+            this.Controls.Add(this.F_Pdf);
+            this.Controls.Add(this.F_Xls);
+            this.Controls.Add(this.F_Doc);
             this.Controls.Add(this.F_sum);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.F_Show);
@@ -141,5 +177,8 @@
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.TextBox F_sum;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button F_Doc;
+        private System.Windows.Forms.Button F_Xls;
+        private System.Windows.Forms.Button F_Pdf;
     }
 }
