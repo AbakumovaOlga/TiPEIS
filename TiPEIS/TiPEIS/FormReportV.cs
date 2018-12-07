@@ -208,8 +208,27 @@ namespace TiPEIS
                 //добавляем абзац в документ
                 range.InsertParagraphAfter();
 
-                // var products = context.Products.ToList();
 
+                string FromDate = F_From.Value.Date.ToString("yyyy.MM.dd");
+                string ToDate = F_To.Value.Date.ToString("yyyy.MM.dd");
+                // var products = context.Products.ToList();
+                var paragraph2 = document.Paragraphs.Add(missing);
+                var range2 = paragraph.Range;
+                //задаем текстВ
+                range2.Text = "С " + FromDate + "  По " + ToDate;
+                //задаем настройки шрифта
+                var font2 = range.Font;
+                font2.Size = 12;
+                font2.Name = "Times New Roman";
+                font2.Bold = 1;
+                //задаем настройки абзаца
+                var paragraphFormat2 = range.ParagraphFormat;
+                paragraphFormat2.Alignment = WdParagraphAlignment.wdAlignParagraphCenter;
+                paragraphFormat2.LineSpacingRule = WdLineSpacing.wdLineSpaceSingle;
+                paragraphFormat2.SpaceAfter = 10;
+                paragraphFormat2.SpaceBefore = 0;
+                //добавляем абзац в документ
+                range2.InsertParagraphAfter();
 
                 //создаем таблицу
 
@@ -366,9 +385,14 @@ namespace TiPEIS
                 excelcells.Font.Name = "Times New Roman";
                 excelcells.Font.Size = 11;
 
+
+                string FromDate = F_From.Value.Date.ToString("yyyy.MM.dd");
+                string ToDate = F_To.Value.Date.ToString("yyyy.MM.dd");
+
+
                 excelcells = excelworksheet.get_Range("A2", "E2");
                 excelcells.Merge(Type.Missing);
-                excelcells.Value2 = "на " + DateTime.Now.ToShortDateString();
+                excelcells.Value2 = "с " + FromDate+"    по   "+ ToDate;
                 excelcells.RowHeight = 20;
                 excelcells.HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter;
                 excelcells.VerticalAlignment = Microsoft.Office.Interop.Excel.XlVAlign.xlVAlignCenter;

@@ -121,15 +121,15 @@
             // суммаВозвратаToolStripMenuItem
             // 
             this.суммаВозвратаToolStripMenuItem.Name = "суммаВозвратаToolStripMenuItem";
-            this.суммаВозвратаToolStripMenuItem.Size = new System.Drawing.Size(252, 30);
-            this.суммаВозвратаToolStripMenuItem.Text = "Сумма возврата";
+            this.суммаВозвратаToolStripMenuItem.Size = new System.Drawing.Size(470, 30);
+            this.суммаВозвратаToolStripMenuItem.Text = "Предстоящие поступления денежных средств";
             this.суммаВозвратаToolStripMenuItem.Click += new System.EventHandler(this.суммаВозвратаToolStripMenuItem_Click);
             // 
             // процентыToolStripMenuItem
             // 
             this.процентыToolStripMenuItem.Name = "процентыToolStripMenuItem";
-            this.процентыToolStripMenuItem.Size = new System.Drawing.Size(252, 30);
-            this.процентыToolStripMenuItem.Text = "Проценты";
+            this.процентыToolStripMenuItem.Size = new System.Drawing.Size(486, 30);
+            this.процентыToolStripMenuItem.Text = "Ведомость доходов от предоставления займов";
             this.процентыToolStripMenuItem.Click += new System.EventHandler(this.процентыToolStripMenuItem_Click);
             // 
             // FormMain
